@@ -1,0 +1,8 @@
+title: "The Fencing Archive"
+description: "19th Century Italian Fencing Translations & Notes"
+author: "Your Name"
+theme: jekyll-theme-primer # We override this, but this keeps the build stable
+url: "https://YOUR_USERNAME.github.io"
+baseurl: "/fencing-articles" # MUST match your repository name
+markdown: kramdown
+permalink: /:year/:month/:day/:title/
