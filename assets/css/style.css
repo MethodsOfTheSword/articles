@@ -43,19 +43,16 @@ ul {
 }
 
 ul li {
-    position: relative;
-    padding-left: 1.5rem;
+    display: flex;             /* Turn on the alignment engine */
+    align-items: baseline;     /* Align the "feet" of the text with the bullet */
     margin-bottom: 0.5rem;
 }
 
-/* Custom Bullet: A small elegant square or dash */
 ul li::before {
     content: "▪"; 
     color: var(--accent-color);
     font-size: 1.2rem;
-    position: absolute;
-    left: 0;
-    top: -2px;
+    margin-right: 1rem;
 }
 
 /* Ordered Lists (Numbers) */
