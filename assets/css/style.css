@@ -257,89 +257,33 @@ blockquote {
 /* hide tmx container until JS shows it */
 .tmx-container { display: none; }
 
-/* --- Post list (index) — ensure consistent layout across browsers incl. Safari --- */
+/* --- Post list (index) — simplified and robust layout --- */
 .post-list {
-    padding-left: 0;
-    margin-bottom: 1.5rem;
+    list-style: none; /* we'll use the date column rather than list markers on the index */
+    margin: 0;
+    padding: 0;
 }
 
-.post-list li {
-    /* modern and prefixed flex for broader Safari support */
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-box-align: baseline;
-    -ms-flex-align: baseline;
-    align-items: baseline;
-    margin-bottom: 1rem;
+.post-item { margin-bottom: 1.25rem; }
+
+/* Desktop / wide screens: two-column layout (date + content) */
+@media (min-width: 641px) {
+    .post-item { display: flex; align-items: flex-start; }
+    .post-date {
+        flex: 0 0 clamp(4.5rem, 14vw, 6.875rem); /* scalable, no px */
+        margin-right: 1rem;
+        font-family: 'Consolas', monospace;
+        font-size: 0.9rem;
+        color: #666;
+    }
+    .post-title { font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--accent-color); line-height: 1.15; }
+    .post-description { color: #444; flex: 1; margin-left: 0; }
 }
 
-.post-list li::before { display: none; }
-
-.post-item { margin-bottom: 1.5rem; }
-
-.post-date {
-    font-family: 'Consolas', monospace;
-    font-size: 0.9rem;
-    color: #666;
-    display: inline-block;
-    /* Avoid fixed px sizing — use a clamp() that scales with the viewport but remains
-       tied to rem for accessibility. 110px ≈ 6.875rem (110/16). We allow it to shrink on
-       narrow viewports down to ~4.5rem and cap at 6.875rem on wide viewports. */
-    box-sizing: border-box;
-    flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
-    -webkit-flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
-}
-
-.post-description {
-    font-size: 1rem;
-    color: #444;
-    /* use flexible layout instead of margin-left so wrapping behaves the same in Safari */
-    flex: 1 1 auto;
-    -webkit-flex: 1 1 auto;
-    margin-left: 1rem; /* fallback spacing for older browsers */
-    display: block;
-}
-
+/* Mobile / small screens: stack vertically, date above title */
 @media (max-width: 640px) {
-    .post-list li { display: block; }
-    .post-date { display: block; width: auto; flex: none; margin-bottom: 0.25rem; }
-    .post-description { margin-left: 0; margin-top: 0.25rem; }
-}
-
-/* Responsive tweaks for the archive index list inside the page's post-container.
-   The source markup uses a bare <ul> with inline spans for the date and description.
-   These rules are scoped to `.post-container` to avoid changing other lists. */
-.post-container > ul { padding-left: 0; }
-.post-container > ul > li { display: flex; align-items: flex-start; margin-bottom: 1.5rem; }
-.post-container > ul > li > span:first-child {
-    /* Date column: avoid fixed px sizing — use clamp with rem equivalents so it scales
-       with root font size and viewport while still acting as a fixed column on wide screens. */
-    font-family: 'Consolas', monospace;
-    font-size: 0.9rem;
-    color: #666;
-    display: inline-block;
-    box-sizing: border-box;
-    flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
-    -webkit-flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
-}
-.post-container > ul > li > a {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--accent-color);
-}
-.post-container > ul > li > span:last-child {
-    /* Description that follows the title (uses a <br> in the markup) */
-    display: block;
-    flex: 1 1 auto;
-    margin-left: 1rem;
-    color: #444;
-}
-
-@media (max-width: 640px) {
-    .post-container > ul > li { display: block; }
-    .post-container > ul > li > span:first-child { display: block; width: auto; flex: none; margin-bottom: 0.35rem; }
-    .post-container > ul > li > a { display: block; margin-bottom: 0.25rem; }
-    .post-container > ul > li > span:last-child { margin-left: 0; margin-top: 0.25rem; }
+    .post-item { display: block; }
+    .post-date { display: block; margin-bottom: 0.35rem; }
+    .post-title { display: block; margin-bottom: 0.25rem; }
+    .post-description { margin-top: 0.25rem; }
 }
