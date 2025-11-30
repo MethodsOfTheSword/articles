@@ -8,3 +8,6 @@ markdown: kramdown
 permalink: /:year/:month/:day/:title/
 baseurl: "/articles"
 url: "https://methodsofthesword.github.io"
+titles_from_headings:
+  strip_title: true
+  collections: true
