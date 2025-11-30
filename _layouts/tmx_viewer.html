@@ -1,0 +1,166 @@
+---
+layout: default
+---
+<article class="post-container tmx-viewer-page">
+
+    <div class="back-nav">
+        <a href="{{ '/' | relative_url }}">&larr; Back to Archive</a>
+    </div>
+
+    {% if page.is_translation %}
+    <div style="margin-bottom: 10px;">
+        <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
+            Parallel Text
+        </span>
+    </div>
+    {% endif %}
+
+    <h1 class="post-title">{{ page.title }}</h1>
+    
+    {% if page.subtitle %}
+        <p class="post-meta">{{ page.date | date: "%d %B %Y" }} • {{ page.subtitle }}</p>
+    {% endif %}
+
+    <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px;">
+        <strong style="color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;">Source:</strong>
+        <a href="{{ '/assets/sources/' | relative_url }}{{ page.tmx_filename }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
+            💾 Download Raw TMX
+        </a>
+    </div>
+
+    <div id="loading-msg" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+        Loading translation memory...
+    </div>
+
+    <div id="tmx-grid" class="tmx-container" style="display: none;">
+        <div class="tmx-header">
+            <div class="tmx-col-head">{{ page.source_label }}</div>
+            <div class="tmx-col-head">{{ page.target_label }}</div>
+        </div>
+        </div>
+
+    {% include version_links.html %}
+
+</article>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // Config from Front Matter
+    const tmxUrl = "{{ '/assets/sources/' | relative_url }}{{ page.tmx_filename }}";
+    const srcCode = "{{ page.source_lang_code }}"; // "it"
+    const tgtCode = "{{ page.target_lang_code }}"; // "en"
+
+    fetch(tmxUrl)
+        .then(response => response.text())
+        .then(str => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(str, "text/xml");
+            
+            const body = xmlDoc.getElementsByTagName("body")[0];
+            const tus = body.getElementsByTagName("tu");
+            const grid = document.getElementById("tmx-grid");
+
+            // Loop through Translation Units
+            for (let i = 0; i < tus.length; i++) {
+                let tu = tus[i];
+                let tuvs = tu.getElementsByTagName("tuv");
+                let srcText = "[Missing]";
+                let tgtText = "";
+
+                // Find the languages
+                for (let j = 0; j < tuvs.length; j++) {
+                    // Get lang attribute (handles xml:lang)
+                    let lang = tuvs[j].getAttribute("xml:lang");
+                    let seg = tuvs[j].getElementsByTagName("seg")[0];
+                    let text = seg ? seg.textContent : "";
+
+                    if (lang == srcCode) srcText = text;
+                    if (lang == tgtCode) tgtText = text;
+                }
+
+                // Create Row
+                let row = document.createElement("div");
+                row.className = "tmx-row";
+                row.innerHTML = `
+                    <div class="tmx-cell source">${srcText}</div>
+                    <div class="tmx-cell target">${tgtText}</div>
+                `;
+                grid.appendChild(row);
+            }
+
+            // Show Grid
+            document.getElementById("loading-msg").style.display = "none";
+            grid.style.display = "block";
+        })
+        .catch(err => {
+            document.getElementById("loading-msg").innerText = "Error loading TMX: " + err;
+        });
+});
+</script>
+
+<style>
+    /* Grid Container */
+    .tmx-container {
+        border-top: 2px solid #8b0000;
+        font-family: "Georgia", serif; /* Academic Look */
+    }
+
+    /* Sticky Headers */
+    .tmx-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        position: sticky;
+        top: 0;
+        background: white;
+        border-bottom: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        z-index: 100;
+    }
+
+    .tmx-col-head {
+        padding: 10px 15px;
+        font-family: sans-serif;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        color: #8b0000;
+        letter-spacing: 1px;
+    }
+
+    /* Rows */
+    .tmx-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Hover Effect: Highlights the whole row to keep place */
+    .tmx-row:hover {
+        background-color: #fffaf0; /* Pale yellow */
+    }
+
+    /* Cells */
+    .tmx-cell {
+        padding: 15px;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    .tmx-cell.source {
+        border-right: 1px solid #eee;
+        color: #444;
+    }
+    
+    .tmx-cell.target {
+        color: #000;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .tmx-header { display: none; }
+        .tmx-row { display: flex; flex-direction: column; border-bottom: 4px solid #eee; }
+        .tmx-cell.source { border-right: none; border-bottom: 1px dashed #ccc; color: #666; font-size: 0.9em; }
+    }
+</style>
