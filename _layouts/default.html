@@ -73,61 +73,64 @@
 
     {% if article_type == 'translation' %}
         
-        {% comment %} 1. Define the unique base ID based on the current article's slug {% endcomment %}
-        {% assign post_date = page.date | date: "%Y-%m-%d" %}
-        {% assign unique_id_prefix = post_date | append: "-" | append: page.slug | append: "-" %} 
+        {% comment %} 1. DEFINE THE UNIQUE ID for the current article group {% endcomment %}
+{% assign unique_id_prefix = page.name | remove: '.md' | append: '-' %} 
+{% comment %} This calculates: 1928-10-01-nadi-fioretto- {% endcomment %}
+{% assign found_links = false %}
+
+
+<div class="language-switcher" style="text-align: center; margin: 3rem 0 1rem 0;">
+    <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #8b0000; font-weight: bold;">
+        View Other Versions:
+    </span>
+    
+    {% comment %} 2. SCAN ALL POSTS FOR MATCHING PREFIX {% endcomment %}
+    {% for post in site.posts %}
+        {% assign post_name_base = post.name | remove: '.md' %}
         
-        {% assign found_links = false %}
-
-        <div class="language-switcher" style="text-align: center; margin: 3rem 0 1rem 0;">
-            <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #8b0000; font-weight: bold;">
-                View Other Versions:
-            </span>
+        {% comment %} Check if the post name contains the unique ID prefix {% endcomment %}
+        {% if post_name_base contains unique_id_prefix and post.url != page.url %}
             
-            {% comment %} 2. SCAN ALL POSTS FOR MATCHING PREFIX {% endcomment %}
-            {% for post in site.posts %}
-                {% assign post_name = post.name | remove: ".md" %}
+            {% assign found_links = true %}
+            
+            {% comment %} The rest of the logic (suffix analysis) is correct {% endcomment %}
+            {% assign suffix = post_name_base | remove: unique_id_prefix %}
+            {% assign lang_code = suffix | split: "_" | last %}
+            
+            <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
                 
-                {% if post_name contains unique_id_prefix and post.url != page.url %}
-                    
-                    {% assign found_links = true %}
-                    
-                    {% comment %} Extract the suffix (e.g., transcription_it) {% endcomment %}
-                    {% assign suffix = post_name | remove: unique_id_prefix %}
-                    {% assign lang_code = suffix | split: "_" | last %}
-                    
-                    <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
-                        
-                        {% comment %} LABEL LOGIC: Analyze the suffix for role {% endcomment %}
-                        {% if suffix contains "transcription_" %}
-                            📝 Original {{ lang_code | upcase }} Transcription
-                        {% elsif suffix contains "translation_" %}
-                            🇫🇷 {{ lang_code | upcase }} Translation
-                        {% endif %}
-
-                    </a>
+                {% comment %} LABEL LOGIC: Checks the suffix for role {% endcomment %}
+                {% if suffix contains "transcription_" %}
+                    📝 Original {{ lang_code | upcase }} Transcription
+                {% elsif suffix contains "translation_" %}
+                    🇫🇷 {{ lang_code | upcase }} Translation
                 {% endif %}
-            {% endfor %}
-            
-            {% comment %} 3. ADD FALLBACK LINK TO ENGLISH DEFAULT (If we are viewing a secondary page) {% endcomment %}
-            {% if page.lang_code %}
-                {% assign english_default_filename = post_date | append: "-" | append: page.slug | remove: "-translation" | remove: "-transcription" | remove: page.lang_code | remove: '-' | append: ".md" %}
-                
-                {% for post in site.posts %}
-                    {% if post.name == english_default_filename %}
-                        <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
-                            🇺🇸 English Translation
-                        </a>
-                    {% endif %}
-                {% endfor %}
+
+            </a>
+        {% endif %}
+    {% endfor %}
+    
+    {% comment %} 3. ADD FALLBACK LINK TO ENGLISH DEFAULT (If we are viewing a secondary page) {% endcomment %}
+    {% if page.name contains "-translation_" or page.name contains "-transcription_" %}
+        {% assign post_date = page.date | date: "%Y-%m-%d" %}
+        {% assign core_slug = page.slug | remove: "translation" | remove: "transcription" | remove: page.lang_code | remove: "-" %}
+        {% assign english_default_filename = post_date | append: "-" | append: core_slug | append: ".md" %}
+        
+        {% for post in site.posts %}
+            {% if post.name == english_default_filename %}
+                <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
+                    🇺🇸 English Translation
+                </a>
             {% endif %}
+        {% endfor %}
+    {% endif %}
 
-            {% comment %} 4. MESSAGE IF NOTHING WAS FOUND (Only display if we are on the main article) {% endcomment %}
-            {% unless found_links or page.name contains "-translation_" or page.name contains "-transcription_" %}
-                <p style="text-align: center; font-size: 0.9rem; color: #888;">No companion versions found.</p>
-            {% endunless %}
+    {% comment %} 4. MESSAGE IF NOTHING WAS FOUND {% endcomment %}
+    {% unless found_links or page.name contains "-translation_" or page.name contains "-transcription_" %}
+        <p style="text-align: center; font-size: 0.9rem; color: #888;">No companion versions found.</p>
+    {% endunless %}
 
-        </div>
+</div>
     {% endif %}
 
     {% if page.author %}
