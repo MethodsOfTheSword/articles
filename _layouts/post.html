@@ -101,7 +101,7 @@ layout: default
             {% assign dl_link = final_tmx %}
             {% unless dl_link contains '://' %}{% assign dl_link = base_asset_path | append: dl_link %}{% endunless %}
             <a href="{{ dl_link }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
-                💾 TMX Data
+                💾 Raw <abbr title="File format for translations">TMX</abbr>
             </a>
         {% endif %}
 
