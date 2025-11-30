@@ -280,9 +280,12 @@ blockquote {
     font-size: 0.9rem;
     color: #666;
     display: inline-block;
-    width: 110px;
-    flex: 0 0 110px; /* keep a fixed column for the date */
-    -webkit-flex: 0 0 110px;
+    /* Avoid fixed px sizing — use a clamp() that scales with the viewport but remains
+       tied to rem for accessibility. 110px ≈ 6.875rem (110/16). We allow it to shrink on
+       narrow viewports down to ~4.5rem and cap at 6.875rem on wide viewports. */
+    box-sizing: border-box;
+    flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
+    -webkit-flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
 }
 
 .post-title {
@@ -305,4 +308,38 @@ blockquote {
     .post-list li { display: block; }
     .post-date { display: block; width: auto; flex: none; margin-bottom: 0.25rem; }
     .post-description { margin-left: 0; margin-top: 0.25rem; }
+}
+
+/* Responsive tweaks for the archive index list inside the page's post-container.
+   The source markup uses a bare <ul> with inline spans for the date and description.
+   These rules are scoped to `.post-container` to avoid changing other lists. */
+.post-container > ul { padding-left: 0; }
+.post-container > ul > li { display: flex; align-items: flex-start; margin-bottom: 1.5rem; }
+.post-container > ul > li > span:first-child {
+    /* Date column */
+    font-family: 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: #666;
+    display: inline-block;
+    width: 110px;
+    flex: 0 0 110px;
+}
+.post-container > ul > li > a {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+.post-container > ul > li > span:last-child {
+    /* Description that follows the title (uses a <br> in the markup) */
+    display: block;
+    flex: 1 1 auto;
+    margin-left: 1rem;
+    color: #444;
+}
+
+@media (max-width: 640px) {
+    .post-container > ul > li { display: block; }
+    .post-container > ul > li > span:first-child { display: block; width: auto; flex: none; margin-bottom: 0.35rem; }
+    .post-container > ul > li > a { display: block; margin-bottom: 0.25rem; }
+    .post-container > ul > li > span:last-child { margin-left: 0; margin-top: 0.25rem; }
 }
