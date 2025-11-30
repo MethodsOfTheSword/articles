@@ -54,6 +54,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const fileLink = document.getElementById("file-name-link");
     const title = document.getElementById("viewer-title");
 
+    // GitHub edit link configuration (client-side only - no Liquid required)
+    const GH_OWNER = 'methodsofthesword';
+    const GH_REPO = 'articles';
+    const GH_BRANCH = 'main';
+    const GH_EDIT_BASE = `https://github.com/${GH_OWNER}/${GH_REPO}/edit/${GH_BRANCH}/assets/sources/`;
+
     if (!fileName) {
         msgContainer.innerHTML = "<strong>Error:</strong> No file specified in URL.";
         title.innerText = "Error";
@@ -69,6 +75,18 @@ document.addEventListener("DOMContentLoaded", function() {
     if (fileLink) {
         fileLink.innerText = fileName;
         fileLink.href = assetsPath + fileName;
+    }
+
+    // Add a top-level "Edit on GitHub" link (opens the file in GitHub editor at line 1)
+    const viewerPage = document.querySelector('.tmx-viewer-page');
+    if (viewerPage) {
+        const editWrapper = document.createElement('div');
+        editWrapper.className = 'edit-on-github-root';
+        editWrapper.innerHTML = `<a class="edit-on-github-link" href="${GH_EDIT_BASE + encodeURIComponent(fileName)}#L1" target="_blank" rel="noopener">✎ Edit this TMX on GitHub</a>`;
+        // insert after the source-bar for visibility
+        const sourceBar = document.querySelector('.source-bar');
+        if (sourceBar && sourceBar.parentNode) sourceBar.parentNode.insertBefore(editWrapper, sourceBar.nextSibling);
+        else viewerPage.insertBefore(editWrapper, viewerPage.firstChild);
     }
 
     // 4. SMART BACK BUTTON LOGIC
@@ -133,6 +151,9 @@ document.addEventListener("DOMContentLoaded", function() {
             // ===============================================
             // RENDER LOOP
             // ===============================================
+            // We'll keep a search pointer to map each <tu> to a line number in the raw file.
+            let raw = str; // original fetched text
+            let searchPos = 0;
             for (let i = 0; i < tus.length; i++) {
                 let tu = tus[i];
                 let tuvs = tu.getElementsByTagName("tuv");
@@ -165,6 +186,37 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 row.appendChild(srcCell);
                 row.appendChild(tgtCell);
+                // Try to find the approximate line number for this <tu> in the raw file
+                let tuLine = 1;
+                try {
+                    let tuIndex = raw.indexOf('<tu', searchPos);
+                    if (tuIndex === -1) {
+                        // fallback: search for a unique snippet from the source text
+                        let snippet = srcText && srcText.length > 10 ? srcText.slice(0, 20) : srcText || tgtText.slice(0,20);
+                        if (snippet) {
+                            let snIndex = raw.indexOf(snippet, searchPos);
+                            if (snIndex !== -1) tuIndex = snIndex;
+                        }
+                    }
+                    if (tuIndex !== -1) {
+                        // compute 1-based line number
+                        tuLine = raw.slice(0, tuIndex).split('\n').length;
+                        searchPos = tuIndex + 1;
+                    }
+                } catch (e) {
+                    // ignore and leave tuLine = 1
+                }
+
+                // Add small per-row edit link that opens GitHub editor at the computed line
+                const editLink = document.createElement('a');
+                editLink.className = 'edit-link';
+                editLink.href = GH_EDIT_BASE + encodeURIComponent(fileName) + '#L' + tuLine;
+                editLink.target = '_blank';
+                editLink.rel = 'noopener';
+                editLink.innerText = '✎';
+                editLink.title = 'Edit this segment on GitHub (may prompt to fork)';
+                // append edit link to the target cell (right side)
+                tgtCell.appendChild(editLink);
                 grid.appendChild(row);
             }
 
@@ -192,4 +244,10 @@ document.addEventListener("DOMContentLoaded", function() {
         .tmx-row { display: flex; flex-direction: column; }
         .tmx-cell.source { border-right: none; border-bottom: 1px dashed #eee; }
     }
+    /* Edit on GitHub link styles */
+    .edit-on-github-root { margin: 0.5rem 0 1rem 0; }
+    .edit-on-github-link { font-size: 0.95rem; color: var(--accent-color); text-decoration: none; }
+    .edit-on-github-link:hover { text-decoration: underline; }
+    .edit-link { margin-left: 0.5rem; font-size: 0.9rem; color: #7b1fa2; text-decoration: none; }
+    .edit-link:hover { text-decoration: underline; }
 </style>
