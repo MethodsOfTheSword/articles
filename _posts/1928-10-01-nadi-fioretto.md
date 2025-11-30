@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: "The Correct Grip of the Foil"
 date: 1928-10-01
 is_translation: true
