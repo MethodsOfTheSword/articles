@@ -1,4 +1,3 @@
-<!-- rebuild -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,121 +19,16 @@
     <h1>{{ page.title }}</h1>
     {% endif %}
 
-
-
     {% if page.subtitle %}
     <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
         {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
     </div>
     {% endif %}
 
-    {% assign article_type = page.article_type | default: 'analysis' %}
-
-    {% if article_type == 'translation' %}
-        
-        {% if page.source_link or page.transcription_link or page.tmx_link %}
-        <div class="download-bar">
-            <span class="download-label">Archive Assets:</span>
-            
-            {% comment %} Helper block for clean linking {% endcomment %}
-            {% assign base_assets_url = '/assets/sources/' | relative_url %}
-            
-            {% if page.source_link %}
-                {% assign src_url = page.source_link %}
-                {% unless src_url contains 'http' %}{% assign src_url = base_assets_url | append: page.source_link %}{% endunless %}
-                
-                <a href="{{ src_url }}" target="_blank" class="dl-link">
-                    🖼️ {{ page.source_label | default: "Original Source" }}
-                </a>
-            {% endif %}
-
-            {% if page.transcription_link %}
-                {% assign txt_url = page.transcription_link %}
-                {% unless txt_url contains 'http' or txt_url contains '/' %}{% assign txt_url = base_assets_url | append: page.transcription_link %}{% endunless %}
-                
-                <a href="{{ txt_url }}" target="_blank" class="dl-link">
-                    📝 {{ page.transcription_label | default: "Transcription" }}
-                </a>
-            {% endif %}
-
-            {% if page.tmx_link %}
-                <a href="{{ base_assets_url }}{{ page.tmx_link }}" download class="dl-link">
-                    💾 TMX
-                </a>
-            {% endif %}
-            
-        </div>
-        <hr class="fencing-divider">
-        {% endif %}
-    {% endif %}
-
     <div class="post-content">
         {{ content }}
     </div>
 
-    <hr class="fencing-divider">
-
-    {% if article_type == 'translation' %}
-        
-   {% comment %} 1. Define Unique ID Prefix {% endcomment %}
-{% assign post_date = page.date | date: "%Y-%m-%d" %}
-{% assign base_slug = page.slug %}
-{% assign unique_id_prefix = post_date | append: "-" | append: base_slug | append: "-" %}
-{% assign found_links = false %}
-
-<div class="language-switcher" style="text-align: center; margin: 3rem 0 1rem 0;">
-    <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #8b0000; font-weight: bold;">
-        View Other Versions:
-    </span>
-
-    {% comment %} Loop through posts to find companions {% endcomment %}
-    {% for post in site.posts %}
-        {% assign post_name_base = post.relative_path | split: '/' | last | split: '.' | first %}
-
-        {% assign min_length = unique_id_prefix | size | plus: 3 %}
-
-        {% if post_name_base | size > min_length and post.url != page.url %}
-            {% assign post_prefix = post_name_base | slice: 0, unique_id_prefix | size %}
-            
-            {% if post_prefix == unique_id_prefix %}
-                {% assign found_links = true %}
-
-                {% assign suffix = post_name_base | remove: unique_id_prefix %}
-                {% assign lang_code = suffix | split: "_" | last %}
-
-                <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
-                    {% if suffix contains "transcription_" %}
-                        📝 Original {{ lang_code | upcase }} Transcription
-                    {% elsif suffix contains "translation_" %}
-                        🌐 {{ lang_code | upcase }} Translation
-                    {% endif %}
-                </a>
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-
-    {% comment %} Link back to English base version {% endcomment %}
-    {% if page.relative_path contains "-translation_" or page.relative_path contains "-transcription_" %}
-        {% assign english_default_filename = post_date | append: "-" | append: base_slug | append: ".md" %}
-
-        {% for post in site.posts %}
-            {% assign p_name = post.relative_path | split: '/' | last %}
-            {% if p_name == english_default_filename %}
-                <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
-                    🇺🇸 English Translation
-                </a>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-
-    {% unless found_links or page.relative_path contains "-translation_" or page.relative_path contains "-transcription_" %}
-        <p style="text-align: center; font-size: 0.9rem; color: #888;">
-            No companion versions found.
-        </p>
-    {% endunless %}
-</div>
-
-    {% endif %}
 
     {% if page.author %}
     <div style="text-align: right; margin-top: 60px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
