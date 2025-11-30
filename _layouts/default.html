@@ -19,13 +19,7 @@
     <h1>{{ page.title }}</h1>
     {% endif %}
 
-<ul style="font-family: monospace; font-size: 0.9rem;">
-{% for post in site.posts %}
-  <li>
-    RAW OBJECT: {{ post | inspect }}
-  </li>
-{% endfor %}
-</ul>
+
 
     {% if page.subtitle %}
     <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
@@ -81,60 +75,50 @@
 
     {% if article_type == 'translation' %}
         
-    {% comment %} 1. Define the Unique ID based on confirmed working variables {% endcomment %}
+   {% comment %} 1. Define Unique ID Prefix {% endcomment %}
 {% assign post_date = page.date | date: "%Y-%m-%d" %}
-{% assign base_slug = page.slug %} 
-{% assign unique_id_prefix = post_date | append: "-" | append: base_slug | append: "-" %} 
-{% comment %} This calculates the guaranteed search string: YYYY-MM-DD-slug- {% endcomment %}
-
+{% assign base_slug = page.slug %}
+{% assign unique_id_prefix = post_date | append: "-" | append: base_slug | append: "-" %}
 {% assign found_links = false %}
 
 <div class="language-switcher" style="text-align: center; margin: 3rem 0 1rem 0;">
     <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #8b0000; font-weight: bold;">
         View Other Versions:
     </span>
-    
-    {% comment %} 2. SCAN ALL POSTS FOR MATCHING PREFIX {% endcomment %}
-{% for post in site.posts %}
-    {% assign post_name_base = post.basename %}
-    
-    {% comment %} Define the minimum length a companion must have to be valid {% endcomment %}
-    {% assign min_length = unique_id_prefix | size | plus: 3 %}
 
-    {% comment %} Check 1: Must be longer than the prefix AND not the current page {% endcomment %}
-    {% if post_name_base | size > min_length and post.url != page.url %}
-        
-        {% comment %} Check 2: Slice the post name to the length of the prefix and compare {% endcomment %}
-        {% assign post_prefix = post_name_base | slice: 0, unique_id_prefix | size %}
-        
-        {% if post_prefix == unique_id_prefix %}
-            
-            {% assign found_links = true %}
-            
-            {% comment %} Logic Success: Extract suffix and render button {% endcomment %}
-            {% assign suffix = post_name_base | remove: unique_id_prefix %}
-            {% assign lang_code = suffix | split: "_" | last %}
-            
-            <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
-                
-                {% comment %} LABEL LOGIC: Check the suffix for role {% endcomment %}
-                {% if suffix contains "transcription_" %}
-                    📝 Original {{ lang_code | upcase }} Transcription
-                {% elsif suffix contains "translation_" %}
-                    🇫🇷 {{ lang_code | upcase }} Translation
-                {% endif %}
+    {% comment %} Loop through posts to find companions {% endcomment %}
+    {% for post in site.posts %}
+        {% assign post_name_base = post.relative_path | split: '/' | last | split: '.' | first %}
 
-            </a>
+        {% assign min_length = unique_id_prefix | size | plus: 3 %}
+
+        {% if post_name_base | size > min_length and post.url != page.url %}
+            {% assign post_prefix = post_name_base | slice: 0, unique_id_prefix | size %}
+            
+            {% if post_prefix == unique_id_prefix %}
+                {% assign found_links = true %}
+
+                {% assign suffix = post_name_base | remove: unique_id_prefix %}
+                {% assign lang_code = suffix | split: "_" | last %}
+
+                <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
+                    {% if suffix contains "transcription_" %}
+                        📝 Original {{ lang_code | upcase }} Transcription
+                    {% elsif suffix contains "translation_" %}
+                        🌐 {{ lang_code | upcase }} Translation
+                    {% endif %}
+                </a>
+            {% endif %}
         {% endif %}
-    {% endif %}
-{% endfor %}
-    
-    {% comment %} 3. ADD FALLBACK LINK TO ENGLISH DEFAULT (If viewing a secondary page) {% endcomment %}
-    {% if page.name contains "-translation_" or page.name contains "-transcription_" %}
+    {% endfor %}
+
+    {% comment %} Link back to English base version {% endcomment %}
+    {% if page.relative_path contains "-translation_" or page.relative_path contains "-transcription_" %}
         {% assign english_default_filename = post_date | append: "-" | append: base_slug | append: ".md" %}
-        
+
         {% for post in site.posts %}
-            {% if post.name == english_default_filename %}
+            {% assign p_name = post.relative_path | split: '/' | last %}
+            {% if p_name == english_default_filename %}
                 <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
                     🇺🇸 English Translation
                 </a>
@@ -142,12 +126,13 @@
         {% endfor %}
     {% endif %}
 
-    {% comment %} 4. MESSAGE IF NOTHING WAS FOUND {% endcomment %}
-    {% unless found_links or page.name contains "-translation_" or page.name contains "-transcription_" %}
-        <p style="text-align: center; font-size: 0.9rem; color: #888;">No companion versions found.</p>
+    {% unless found_links or page.relative_path contains "-translation_" or page.relative_path contains "-transcription_" %}
+        <p style="text-align: center; font-size: 0.9rem; color: #888;">
+            No companion versions found.
+        </p>
     {% endunless %}
-
 </div>
+
     {% endif %}
 
     {% if page.author %}
