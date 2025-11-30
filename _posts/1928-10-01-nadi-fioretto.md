@@ -20,6 +20,7 @@ external_transcripts:
     url: "https://fencing-archive.com/partial"
     label: "Archive.org Backup"
     note: "Partial text only"
+tmx_link: "1928-10-01-nadi-fioretto.tmx"
 ---
 
 **Ecco come Nedo Nadi impugna il fioretto.**
