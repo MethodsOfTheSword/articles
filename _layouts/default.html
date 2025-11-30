@@ -9,36 +9,9 @@
 <body>
 
 <article>
-    <div style="margin-bottom: 40px; font-family: sans-serif; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">
-        {% if page.url != "/" %}
-            <a href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">← Back to Archive</a>
-        {% endif %}
-    </div>
-    
-    {% if page.title %}
-    <h1>{{ page.title }}</h1>
-    {% endif %}
-
-    {% if page.subtitle %}
-    <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
-        {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
-    </div>
-    {% endif %}
-
     <div class="post-content">
         {{ content }}
     </div>
-
-
-    {% if page.author %}
-    <div style="text-align: right; margin-top: 60px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-        {{ page.author }}
-    </div>
-    {% endif %}
-    
-    <footer style="text-align: center; font-size: 0.8rem; margin-top: 80px; color: #666; border-top: 1px solid #eee; padding-top: 20px;">
-        &copy; {{ site.time | date: '%Y' }} {{ site.author }}. All Rights Reserved.
-    </footer>
 </article>
 
 </body>
