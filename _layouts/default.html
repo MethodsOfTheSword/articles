@@ -87,6 +87,17 @@
         View Other Versions:
     </span>
     
+    {% comment %} !!! DEBUG MODE START - DELETE THIS BLOCK AFTER TESTING !!! {% endcomment %}
+{% assign debug_base_key = page.name | remove: '.md' %}
+
+{% comment %} Output the unique ID of the current page. Should be: 1928-10-01-nadi-fioretto {% endcomment %}
+<h3 style="color:red; margin-top: 50px;">DEBUG BASE KEY: {{ debug_base_key }}</h3> 
+
+{% comment %} Output the name of a companion post (must be manually confirmed by user) {% endcomment %}
+<h3 style="color:red;">DEBUG SAMPLE POST NAME: {{ site.posts | where: "name", "1928-10-01-nadi-fioretto-transcription_it.md" | first.name }}</h3> 
+{% comment %} !!! DEBUG MODE END !!! {% endcomment %}
+
+
     {% comment %} 2. SCAN ALL POSTS FOR MATCHING PREFIX {% endcomment %}
     {% for post in site.posts %}
         {% assign post_name_base = post.name | remove: '.md' %}
