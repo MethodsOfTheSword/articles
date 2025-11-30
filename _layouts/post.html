@@ -7,22 +7,12 @@ layout: default
         <a href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">&larr; Back to Archive</a>
     </div>
 
-    {% if page.is_translation %}
-    <div style="margin-bottom: 10px;">
-        <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
-            Translation
-        </span>
-    </div>
-    {% endif %}
-
     {% if page.slug contains "-transcript_" or page.slug contains "-transcription_" %}
-        
         {% if page.slug contains "-transcription_" %}
             {% assign badge_lang = page.slug | split: "-transcription_" | last | upcase %}
         {% else %}
             {% assign badge_lang = page.slug | split: "-transcript_" | last | upcase %}
         {% endif %}
-
         <div style="margin-bottom: 10px;">
             <span style="background-color: #fff3e0; color: #e65100; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
                 Transcription ({{ badge_lang }})
@@ -31,15 +21,14 @@ layout: default
     {% endif %}
 
     {% if page.slug contains "-translation_" %}
-        
         {% assign badge_lang = page.slug | split: "-translation_" | last | upcase %}
-
         <div style="margin-bottom: 10px;">
             <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
                 Translation ({{ badge_lang }})
             </span>
         </div>
     {% endif %}
+
 
     <header>
         <h1 class="post-title">{{ page.title }}</h1>
@@ -49,37 +38,41 @@ layout: default
         </div>
         {% endif %}
 
-        {% comment %} 
-       STEP A: AUTO-DISCOVERY LOGIC
-       1. Get the current filename without folder or extension
-       2. Look for a matching .tmx file in site.static_files
-    {% endcomment %}
+    {% assign current_filename = page.path | split: '/' | last | replace: '.md', '' | downcase %}
+    {% assign base_name = current_filename %}
+    
+    {% if base_name contains "-translation_" %}
+        {% assign base_name = base_name | split: "-translation_" | first %}
+    {% elsif base_name contains "-transcript_" %}
+        {% assign base_name = base_name | split: "-transcript_" | first %}
+    {% endif %}
 
-    {% assign current_filename = page.path | split: '/' | last | replace: '.md', '' %}
-    {% assign auto_tmx_file = nil %}
+    {% assign final_tmx = nil %}
 
-    {% for file in site.static_files %}
-        {% if file.name == current_filename | append: ".tmx" or file.name == current_filename | append: ".TMX" %}
-            {% assign auto_tmx_file = file.name %}
-            {% break %}
-        {% endif %}
-    {% endfor %}
+    {% if page.tmx_link %}
+        {% assign final_tmx = page.tmx_link %}
+    {% endif %}
 
+    {% unless final_tmx %}
+        {% for file in site.static_files %}
+            {% assign static_name = file.name | downcase %}
+            {% if static_name == current_filename | append: ".tmx" %}
+                {% assign final_tmx = file.name %}
+                {% break %}
+            {% elsif static_name == base_name | append: ".tmx" %}
+                {% assign final_tmx = file.name %}
+                {% break %}
+            {% endif %}
+        {% endfor %}
+    {% endunless %}
 
-    {% comment %} 
-       STEP B: DISPLAY THE BAR 
-       Show if we found an Auto-TMX OR if sources materials exist
-    {% endcomment %}
-
-    {% if auto_tmx_file or page.source_link or page.transcription_link or page.tmx_link %}
+    {% if final_tmx or page.source_link or page.transcription_link %}
     <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
         
         <strong style="color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;">Source Files:</strong>
         
-        {% assign base_asset_path = '/assets/sources/' | relative_url %}
-
-        {% if auto_tmx_file %}
-            <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ auto_tmx_file }}" target="_blank" style="
+        {% if final_tmx %}
+            <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ final_tmx }}" target="_blank" style="
                 text-decoration: none; 
                 background-color: #f3e5f5; 
                 color: #7b1fa2; 
@@ -95,6 +88,7 @@ layout: default
         {% endif %}
 
         {% if page.source_link %}
+            {% assign base_asset_path = '/assets/sources/' | relative_url %}
             {% assign src = page.source_link %}
             {% unless src contains '://' %}{% assign src = base_asset_path | append: src %}{% endunless %}
             <a href="{{ src }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
@@ -102,15 +96,17 @@ layout: default
             </a>
         {% endif %}
 
-        {% if page.tmx_link %}
-            {% assign tmx = page.tmx_link %}
-            {% unless tmx contains '://' %}{% assign tmx = base_asset_path | append: tmx %}{% endunless %}
-            <a href="{{ tmx }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
+        {% if final_tmx %}
+            {% assign base_asset_path = '/assets/sources/' | relative_url %}
+            {% assign dl_link = final_tmx %}
+            {% unless dl_link contains '://' %}{% assign dl_link = base_asset_path | append: dl_link %}{% endunless %}
+            <a href="{{ dl_link }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
                 💾 TMX Data
             </a>
         {% endif %}
 
         {% if page.transcription_link %}
+            {% assign base_asset_path = '/assets/sources/' | relative_url %}
             {% assign txt = page.transcription_link %}
             {% unless txt contains '://' %}{% assign txt = base_asset_path | append: txt %}{% endunless %}
             <a href="{{ txt }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
