@@ -228,6 +228,19 @@ blockquote {
 }
 .viewer-btn:hover { background-color: #eddff5; }
 
+/* Back to archive link (used in post layout) */
+.back-to-archive {
+    margin-bottom: 2.5rem; /* ~40px */
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.0625rem; /* 1px -> rem */
+}
+.back-to-archive .back-link {
+    text-decoration: none;
+    color: var(--accent-color);
+}
+
 /* --- Source bar / viewer helpers --- */
 .source-bar {
     background: #f9f9f9;

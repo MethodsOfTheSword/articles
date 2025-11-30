@@ -6,9 +6,9 @@ permalink: /tmx_viewer/
 
 <div class="tmx-viewer-page">
 
-    <div class="back-nav">
+    <div class="back-to-archive">
         <a id="smart-back-btn" href="{{ '/' | relative_url }}" class="back-link">
-            &larr; Back to Archive
+            &larr; Back to Article
         </a>
     </div>
 
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (match && backBtn) {
         const postUrl = `${baseUrl}/${match[1]}/${match[2]}/${match[3]}/${match[4]}/`;
         backBtn.href = postUrl;
-        backBtn.innerHTML = "&larr; Return to Article";
+        backBtn.innerHTML = "&larr; Back to Article";
     }
 
     // 5. FETCH & PARSE
