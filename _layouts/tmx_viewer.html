@@ -1,41 +1,41 @@
 ---
 layout: default
 ---
-<article class="tmx-page">
+<article class="post-container tmx-viewer-page">
 
-    <div style="margin-bottom: 20px;">
-        <a href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">&larr; Back to Archive</a>
+    <div class="back-nav">
+        <a href="{{ '/' | relative_url }}">&larr; Back to Archive</a>
     </div>
 
-    <header style="margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
-        <h1 style="margin-bottom: 10px;">{{ page.title }}</h1>
-        <p style="color: #666; font-style: italic;">
-            Parallel Text Viewer • TMX Source
-        </p>
+    {% if page.is_translation %}
+    <div style="margin-bottom: 10px;">
+        <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
+            Parallel Text
+        </span>
+    </div>
+    {% endif %}
 
-        <div style="margin-top: 15px;">
-            <a href="{{ '/assets/sources/' | relative_url }}{{ page.tmx_filename }}" download style="
-                background: #8b0000; 
-                color: white; 
-                padding: 8px 12px; 
-                text-decoration: none; 
-                border-radius: 4px; 
-                font-size: 0.8rem; 
-                text-transform: uppercase; 
-                font-weight: bold;">
-                💾 Download Raw TMX
-            </a>
-        </div>
-    </header>
+    <h1 class="post-title">{{ page.title }}</h1>
+    
+    {% if page.subtitle %}
+        <p class="post-meta">{{ page.date | date: "%d %B %Y" }} • {{ page.subtitle }}</p>
+    {% endif %}
 
-    <div id="loading-indicator" style="text-align: center; color: #888; padding: 50px;">
-        Loading TMX data...
+    <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px;">
+        <strong style="color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;">Source:</strong>
+        <a href="{{ '/assets/sources/' | relative_url }}{{ page.tmx_filename }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
+            💾 Download Raw TMX
+        </a>
     </div>
 
-    <div id="tmx-container" class="tmx-grid" style="display: none;">
+    <div id="loading-msg" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+        Loading translation memory...
+    </div>
+
+    <div id="tmx-grid" class="tmx-container" style="display: none;">
         <div class="tmx-header">
-            <div class="tmx-col-title">{{ page.source_label }}</div>
-            <div class="tmx-col-title">{{ page.target_label }}</div>
+            <div class="tmx-col-head">{{ page.source_label }}</div>
+            <div class="tmx-col-head">{{ page.target_label }}</div>
         </div>
         </div>
 
@@ -51,58 +51,60 @@ document.addEventListener("DOMContentLoaded", function() {
     const srcCode = "{{ page.source_lang_code }}"; 
     const tgtCode = "{{ page.target_lang_code }}";
 
-    console.log("Attempting to fetch TMX from:", tmxUrl); // DEBUG LOG
+    // Debug Log
+    console.log("Fetching TMX from:", tmxUrl);
+
+    // 2. Identify HTML Elements (Crucial Step)
+    const grid = document.getElementById("tmx-grid");
+    const msgContainer = document.getElementById("loading-msg");
+
+    if (!grid || !msgContainer) {
+        console.error("HTML Mismatch: Could not find 'tmx-grid' or 'loading-msg' divs.");
+        return;
+    }
 
     fetch(tmxUrl)
         .then(response => {
-            // Check if file exists (404 check)
-            if (!response.ok) {
-                throw new Error(`HTTP Error ${response.status}: File not found at ${tmxUrl}`);
-            }
+            if (!response.ok) throw new Error("File not found (404)");
             return response.text();
         })
         .then(str => {
-            // 2. Parse XML
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(str, "text/xml");
             
-            // CHECK FOR PARSER ERRORS
-            const parserError = xmlDoc.querySelector("parsererror");
-            if (parserError) {
-                console.error("Raw XML content that failed:", str.substring(0, 500) + "...");
-                throw new Error("XML Parsing Failed. The file might be a 404 HTML page or contain invalid XML characters.");
+            // Check for XML parsing errors
+            if (xmlDoc.querySelector("parsererror")) {
+                throw new Error("Invalid XML format.");
             }
-
-            // 3. Safe Access to Body
+            
             const body = xmlDoc.getElementsByTagName("body")[0];
-            if (!body) {
-                console.error("XML Structure Dump:", xmlDoc);
-                throw new Error("Valid XML found, but no <body> tag found. Check TMX structure.");
-            }
+            if (!body) throw new Error("TMX file has no <body> tag.");
 
             const tus = body.getElementsByTagName("tu");
-            const grid = document.getElementById("tmx-grid");
+            console.log(`Found ${tus.length} translation units.`);
 
-            console.log(`Found ${tus.length} translation units.`); // DEBUG LOG
-
-            // 4. Loop through Translation Units
+            // Loop through Translation Units
             for (let i = 0; i < tus.length; i++) {
                 let tu = tus[i];
                 let tuvs = tu.getElementsByTagName("tuv");
-                let srcText = "[Missing Source]";
+                let srcText = ""; // Default empty
                 let tgtText = "";
 
+                // Find the languages
                 for (let j = 0; j < tuvs.length; j++) {
                     let lang = tuvs[j].getAttribute("xml:lang");
                     let seg = tuvs[j].getElementsByTagName("seg")[0];
                     let text = seg ? seg.textContent : "";
 
-                    // Robust Language Matching (Case Insensitive & Partial)
-                    // e.g., matches "it-IT" if code is "it"
+                    // Safe match (case insensitive)
                     if (lang && lang.toLowerCase().includes(srcCode.toLowerCase())) srcText = text;
                     if (lang && lang.toLowerCase().includes(tgtCode.toLowerCase())) tgtText = text;
                 }
 
+                // If source text is missing, it might be a formatting tag, skip or show placeholder
+                if (!srcText && !tgtText) continue; 
+
+                // Create Row
                 let row = document.createElement("div");
                 row.className = "tmx-row";
                 row.innerHTML = `
@@ -112,30 +114,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 grid.appendChild(row);
             }
 
-            // 5. Success
-            document.getElementById("loading-msg").style.display = "none";
-            grid.style.display = "block"; // or flex
+            // Show Grid, Hide Loader
+            msgContainer.style.display = "none";
+            grid.style.display = "block";
         })
         .catch(err => {
             console.error(err);
-            const msgContainer = document.getElementById("loading-msg");
             msgContainer.style.color = "red";
-            msgContainer.innerHTML = `
-                <strong>Error Loading TMX:</strong><br>
-                ${err.message}<br><br>
-                <em>Open your browser console (F12) for details.</em>
-            `;
+            msgContainer.innerHTML = "Error: " + err.message;
         });
 });
 </script>
 
 <style>
-    .tmx-grid {
-        display: flex;
-        flex-direction: column;
+    /* Grid Container */
+    .tmx-container {
         border-top: 2px solid #8b0000;
+        font-family: "Georgia", serif;
     }
 
+    /* Sticky Headers */
     .tmx-header {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -143,12 +141,13 @@ document.addEventListener("DOMContentLoaded", function() {
         top: 0;
         background: white;
         border-bottom: 1px solid #ccc;
-        z-index: 10;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        z-index: 100;
     }
 
-    .tmx-col-title {
+    .tmx-col-head {
         padding: 10px 15px;
+        font-family: sans-serif;
         font-weight: bold;
         text-transform: uppercase;
         font-size: 0.8rem;
@@ -156,23 +155,23 @@ document.addEventListener("DOMContentLoaded", function() {
         letter-spacing: 1px;
     }
 
+    /* Rows */
     .tmx-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         border-bottom: 1px solid #eee;
-        transition: background-color 0.2s;
     }
 
     .tmx-row:hover {
         background-color: #fffaf0;
     }
 
+    /* Cells */
     .tmx-cell {
         padding: 15px;
-        font-family: "Georgia", serif;
         line-height: 1.6;
         font-size: 1rem;
-        white-space: pre-wrap; /* Preserves newlines in the XML */
+        white-space: pre-wrap; /* Keeps line breaks from XML */
     }
 
     .tmx-cell.source {
@@ -184,18 +183,10 @@ document.addEventListener("DOMContentLoaded", function() {
         color: #000;
     }
 
-    .segment-id {
-        display: block;
-        font-family: sans-serif;
-        font-size: 0.6rem;
-        color: #ccc;
-        margin-bottom: 5px;
-        user-select: none;
-    }
-
+    /* Mobile */
     @media (max-width: 768px) {
         .tmx-header { display: none; }
         .tmx-row { display: flex; flex-direction: column; border-bottom: 4px solid #eee; }
-        .tmx-cell.source { border-right: none; border-bottom: 1px dashed #ddd; }
+        .tmx-cell.source { border-right: none; border-bottom: 1px dashed #ccc; color: #666; font-size: 0.9em; }
     }
 </style>
