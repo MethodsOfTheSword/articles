@@ -5,4 +5,4 @@ theme: jekyll-theme-primer # We override this, but this keeps the build stable
 url: "https://methodsofthesword.github.io"
 baseurl: "/articles" # MUST match your repository name
 markdown: kramdown
-permalink: /:year/:month/:day/:title/
+permalink: articles/:year/:month/:day/:title/
