@@ -41,16 +41,7 @@ layout: default
         </div>
     {% endif %}
 
-    <header>
-        <h1 class="post-title">{{ page.title }}</h1>
-        {% if page.subtitle %}
-        <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
-            {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
-        </div>
-        {% endif %}
-    </header>
-
-    {% if page.source_link or page.transcription_link or page.tmx_link %}
+    <header>{% if page.source_link or page.transcription_link or page.tmx_link %}
     <div class="download-bar" style="background: #f9f9f9; padding: 15px; border-left: 4px solid #8b0000; margin-bottom: 30px;">
         <span style="font-weight: bold; margin-right: 10px; color: #333;">Assets:</span>
         
@@ -84,6 +75,13 @@ layout: default
         {% endif %}
     </div>
     {% endif %}
+        <h1 class="post-title">{{ page.title }}</h1>
+        {% if page.subtitle %}
+        <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
+            {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
+        </div>
+        {% endif %}
+    </header>
 
     <div class="post-content">
         {{ content }}
