@@ -110,3 +110,19 @@
 
   {% endif %}
 </div>
+
+<div style="background: yellow; border: 1px solid black; padding: 10px; margin-bottom: 20px;">
+  <strong>DEBUG INFO:</strong><br>
+  Current Slug: [{{ current_slug }}]<br>
+  Calculated Base Slug: [{{ base_slug }}]<br>
+  Is Variant? {{ is_variant }}<br>
+  
+  <strong>Searching for matches...</strong><br>
+  <ul>
+  {% for post in site.posts %}
+    {% if post.slug contains base_slug %}
+       <li>Found match: {{ post.slug }}</li>
+    {% endif %}
+  {% endfor %}
+  </ul>
+</div>
