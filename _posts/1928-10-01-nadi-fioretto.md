@@ -4,6 +4,7 @@ title: "Come si impugna il fioretto"
 date: 1928-10-01
 is_translation: true
 source_link: "https://www.google.com"
+tmx_link: "https://www.bing.com"
 external_transcripts:
   - lang: "it"
     url: "https://wikisource.org/wiki/Scherma"
