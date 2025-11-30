@@ -1,7 +1,7 @@
 /* assets/css/tufte-markdown.css */
 
 /* --- 1. FONTS & BASICS --- */
-@import url('https://cdn.rawgit.com/edwardtufte/et-book/v2.0.1/et-book.css');
+@import url('et-book.css');
 
 :root {
     --bg-color: #fffff8;       /* Cream Vellum */
@@ -27,7 +27,7 @@ article {
 }
 
 /* --- 2. TYPOGRAPHY --- */
-h1 { font-weight: 400; font-size: 2rem; margin-top: 0; line-height: 1.1; margin-bottom: 0.35em; letter-spacing: -0.6px; }
+h1 { font-weight: 400; font-size: 3rem; margin-top: 0; line-height: 1.1; margin-top: 0.35em; margin-bottom: 0.35em; letter-spacing: -0.6px; }
 
 /* Optional site banner container — target an element wrapping the site title or banner image.
    Keep this short and unobtrusive; adjust max-height or padding to taste. */
