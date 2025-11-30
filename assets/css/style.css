@@ -220,3 +220,57 @@ blockquote {
 
 /* hide tmx container until JS shows it */
 .tmx-container { display: none; }
+
+/* --- Post list (index) — ensure consistent layout across browsers incl. Safari --- */
+.post-list {
+    padding-left: 0;
+    margin-bottom: 1.5rem;
+}
+
+.post-list li {
+    /* modern and prefixed flex for broader Safari support */
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.post-list li::before { display: none; }
+
+.post-item { margin-bottom: 1.5rem; }
+
+.post-date {
+    font-family: 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: #666;
+    display: inline-block;
+    width: 110px;
+    flex: 0 0 110px; /* keep a fixed column for the date */
+    -webkit-flex: 0 0 110px;
+}
+
+.post-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.post-description {
+    font-size: 1rem;
+    color: #444;
+    /* use flexible layout instead of margin-left so wrapping behaves the same in Safari */
+    flex: 1 1 auto;
+    -webkit-flex: 1 1 auto;
+    margin-left: 1rem; /* fallback spacing for older browsers */
+    display: block;
+}
+
+@media (max-width: 640px) {
+    .post-list li { display: block; }
+    .post-date { display: block; width: auto; flex: none; margin-bottom: 0.25rem; }
+    .post-description { margin-left: 0; margin-top: 0.25rem; }
+}
