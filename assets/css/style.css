@@ -276,7 +276,7 @@ blockquote {
         font-size: 0.9rem;
         color: #666;
     }
-    .post-title { font-size: 2rem; margin: 0; line-height: 1.15; }
+    .post-title { font-size: 3rem; margin: 0; line-height: 1.15; }
     .post-description { color: #444; flex: 1; margin-left: 0; }
 }
 
