@@ -11,8 +11,9 @@ title: "Methods of the Sword Archive"
 
   <h2>Articles & Translations</h2>
 
-  <ul class="post-list">
+    <ul class="post-list">
     {% for post in site.posts %}
+      {% unless post.hidden == true %}
       <li class="post-item">
         <span class="post-date">
             {{ post.date | date: "%Y-%m-%d" }}
@@ -24,6 +25,7 @@ title: "Methods of the Sword Archive"
             {{ post.description }}
         </span>
       </li>
+      {% endunless %}
     {% endfor %}
   </ul>
 </article>
