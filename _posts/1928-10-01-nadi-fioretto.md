@@ -1,6 +1,5 @@
 ---
 layout: post
-title: "Come si impugna il fioretto"
 date: 1928-10-01
 is_translation: true
 source_link: "https://www.google.com"
@@ -21,6 +20,7 @@ external_transcripts:
     label: "Archive.org Backup"
     note: "Partial text only"
 ---
+# Come si impugna il fioretto
 
 **Ecco come Nedo Nadi impugna il fioretto.**
 
