@@ -4,7 +4,7 @@ title: "Nadi: How to Hold the Foil"
 subtitle: "Parallel Text (TMX)"
 
 # 1. THE FILE NAME (Must allow matching in assets/sources/)
-tmx_filename: "nadi_hold.tmx" 
+tmx_filename: "1928-10-01-nadi-fioretto.tmx" 
 
 # 2. THE XML LANGUAGE CODES 
 # These must match the xml:lang="..." in your file EXACTLY
