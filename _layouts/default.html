@@ -19,10 +19,6 @@
     <h1>{{ page.title }}</h1>
     {% endif %}
 
-    <p style="color: red; font-size: 0.9rem;">
-    DEBUG CHECK: Date={{ page.date | date: "%Y-%m-%d" }} | Slug={{ page.slug }}
-</p>
-
     {% if page.subtitle %}
     <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
         {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
@@ -77,10 +73,13 @@
 
     {% if article_type == 'translation' %}
         
-        {% comment %} 1. DEFINE THE UNIQUE ID for the current article group {% endcomment %}
-{% assign unique_id_prefix = page.name | remove: '.md' | append: '-' %} 
-{% comment %} This calculates: 1928-10-01-nadi-fioretto- {% endcomment %}
-{% assign found_links = false %}
+    {% assign post_date = page.date | date: "%Y-%m-%d" %}
+    {% assign base_slug = page.slug %} 
+
+    {% comment %} This calculates the unique ID for the search: YYYY-MM-DD-slug- {% endcomment %}
+    {% assign unique_id_prefix = post_date | append: "-" | append: base_slug | append: "-" %} 
+
+    {% assign found_links = false %}    
 
 
 <div class="language-switcher" style="text-align: center; margin: 3rem 0 1rem 0;">
