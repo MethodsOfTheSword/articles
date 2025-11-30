@@ -155,19 +155,9 @@ document.addEventListener("DOMContentLoaded", function() {
             // This uses a simple counter: find each '<tu' in the raw text in order
             // and record the 1-based line number. This is deterministic and fast.
             let raw = str; // original fetched text
-            // Precompute positions (byte offsets) and line numbers for each '<tu' token.
-            const tuPositions = (function computeTuPositions() {
-                const arr = [];
-                let searchPos = 0;
-                while (true) {
-                    const pos = raw.indexOf('<tu', searchPos);
-                    if (pos === -1) break;
-                    const lineNum = raw.slice(0, pos).split(/\r\n|\r|\n/).length;
-                    arr.push({ pos: pos, line: lineNum });
-                    searchPos = pos + 3;
-                }
-                return arr;
-            })();
+            // Per-row TU→line mapping removed: we no longer compute positions for each <tu>.
+            // Keep a placeholder in case other code expects this variable.
+            const tuPositions = [];
 
             for (let i = 0; i < tus.length; i++) {
                 let tu = tus[i];
@@ -201,59 +191,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 row.appendChild(srcCell);
                 row.appendChild(tgtCell);
-                // Determine GitHub line: prefer the line of the TARGET language <tuv> (e.g., English)
-                let tuLine = 1;
-                if (tuPositions && tuPositions[i]) {
-                    // default to the <tu> start line
-                    tuLine = tuPositions[i].line;
-
-                    try {
-                        // look inside the textual slice for this <tu> to find a <tuv> with the target language
-                        const startPos = tuPositions[i].pos;
-                        const endPos = (tuPositions[i + 1] && tuPositions[i + 1].pos) ? tuPositions[i + 1].pos : raw.length;
-                        const tuChunk = raw.slice(startPos, endPos);
-
-                        // Find all <tuv ... xml:lang="..." ...> locations inside this tuChunk
-                        const tuvRegex = /<tuv\b([^>]*)>/gi;
-                        let match;
-                        let foundTuvPos = null;
-                        while ((match = tuvRegex.exec(tuChunk)) !== null) {
-                            const attrs = match[1];
-                            const langMatch = attrs.match(/xml:lang\s*=\s*['\"]([^'\"]+)['\"]/i);
-                            const langVal = langMatch ? langMatch[1].toLowerCase() : '';
-                            // If this tuv's lang matches the detected target language, prefer it
-                            if (langVal && tgtLang && langVal.includes(tgtLang.toLowerCase())) {
-                                foundTuvPos = startPos + match.index;
-                                break;
-                            }
-                        }
-
-                        // If not found by exact match, fallback: choose the second <tuv> in the chunk (common pattern)
-                        if (foundTuvPos === null) {
-                            const secondTuv = tuChunk.match(/<tuv\b([^>]*)>/i);
-                            if (secondTuv) {
-                                // attempt to locate the second occurrence
-                                let occ = 0;
-                                tuvRegex.lastIndex = 0;
-                                while ((match = tuvRegex.exec(tuChunk)) !== null) {
-                                    occ += 1;
-                                    if (occ === 2) { foundTuvPos = startPos + match.index; break; }
-                                }
-                            }
-                        }
-
-                        if (foundTuvPos !== null) {
-                            tuLine = raw.slice(0, foundTuvPos).split(/\r\n|\r|\n/).length;
-                        }
-                    } catch (e) {
-                        // if anything goes wrong, leave tuLine as the tu start line
-                    }
-                }
-
-                // Add small per-row edit link that opens GitHub editor at the computed line
-                const editLink = document.createElement('a');
-                editLink.className = 'edit-link';
-                editLink.href = GH_EDIT_BASE + encodeURIComponent(fileName) + '#L' + tuLine;
+                // Per-row edit links removed. The viewer will keep a single top-level
+                // "✎ Edit this TMX on GitHub" link; no per-row anchors are appended.
                 editLink.target = '_blank';
                 editLink.rel = 'noopener';
                 editLink.innerText = '✎';
