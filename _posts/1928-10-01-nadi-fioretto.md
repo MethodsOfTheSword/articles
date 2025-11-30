@@ -3,7 +3,7 @@ layout: default
 title: "The Correct Grip of the Foil"
 date: 1928-10-01
 is_translation: true
-source_link: "http://www.google.com"
+source_link: "https://www.google.com"
 tmx_link: "https://www.bing.com"
 hidden: false
 ---
