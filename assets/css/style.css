@@ -16,9 +16,9 @@ body {
     color: var(--text-color);
     font-family: 'et-book', Palatino, "Palatino Linotype", Georgia, serif;
     margin: 0;
-    padding: 60px 20px;
+    padding: 36px 18px; /* reduced top/bottom padding to make header/banner less prominent */
     line-height: 1.6;
-    font-size: 1.3rem;
+    font-size: 1.15rem; /* slightly smaller base font for better hierarchy */
 }
 
 article {
@@ -27,7 +27,23 @@ article {
 }
 
 /* --- 2. TYPOGRAPHY --- */
-h1 { font-weight: 400; font-size: 3rem; margin-top: 0; line-height: 1; margin-bottom: 0.5em; letter-spacing: -1px;}
+h1 { font-weight: 400; font-size: 2rem; margin-top: 0; line-height: 1.1; margin-bottom: 0.35em; letter-spacing: -0.6px; }
+
+/* Optional site banner container — target an element wrapping the site title or banner image.
+   Keep this short and unobtrusive; adjust max-height or padding to taste. */
+.site-banner {
+    max-height: 140px; /* limit how tall the banner can grow */
+    overflow: hidden;
+    padding: 12px 0; /* compact vertical padding */
+    display: block;
+}
+
+/* If your layout uses a header element with a site title, make the title smaller and tighter. */
+.site-header .site-title {
+    font-size: 1.6rem;
+    margin: 0;
+    line-height: 1;
+}
 h2 { font-style: italic; font-size: 2rem; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); display: inline-block; padding-bottom: 5px; }
 h3 { font-size: 1.4rem; font-variant: small-caps; letter-spacing: 1px; margin-top: 2rem; color: #444; }
 
