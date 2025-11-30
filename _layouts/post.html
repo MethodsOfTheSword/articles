@@ -36,6 +36,9 @@ layout: default
         <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
             {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
         </div>
+        {% endif %}
+
+        {% assign base_asset_path = '/assets/sources/' | relative_url %}
 
         <div style="background: #222; color: #0f0; padding: 20px; margin: 20px 0; border: 4px solid red; font-family: monospace; white-space: pre-wrap;">
 <strong>🚨 DEBUG CONSOLE</strong>
@@ -67,10 +70,6 @@ layout: default
    Final Target Variable: [{{ final_tmx_target }}]
 --------------------------------------------------
 </div>
-
-        {% endif %}
-
-        {% assign base_asset_path = '/assets/sources/' | relative_url %}
         
         {% assign current_filename = page.path | split: '/' | last | replace: '.md', '' | downcase %}
         {% assign base_name = current_filename %}
