@@ -29,101 +29,102 @@ layout: default
         </div>
     {% endif %}
 
-
     <header>
         <h1 class="post-title">{{ page.title }}</h1>
+        
         {% if page.subtitle %}
         <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
             {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
         </div>
         {% endif %}
 
-    {% assign current_filename = page.path | split: '/' | last | replace: '.md', '' | downcase %}
-    {% assign base_name = current_filename %}
-    
-    {% if base_name contains "-translation_" %}
-        {% assign base_name = base_name | split: "-translation_" | first %}
-    {% elsif base_name contains "-transcript_" %}
-        {% assign base_name = base_name | split: "-transcript_" | first %}
-    {% endif %}
+        {% assign base_asset_path = '/assets/sources/' | relative_url %}
+        
+        {% assign current_filename = page.path | split: '/' | last | replace: '.md', '' | downcase %}
+        {% assign base_name = current_filename %}
+        
+        {% if base_name contains "-translation_" %}
+            {% assign base_name = base_name | split: "-translation_" | first %}
+        {% elsif base_name contains "-transcript_" %}
+            {% assign base_name = base_name | split: "-transcript_" | first %}
+        {% endif %}
 
-    {% assign final_tmx = nil %}
+        {% assign found_tmx_file = nil %}
 
-    {% if page.tmx_link %}
-        {% assign final_tmx = page.tmx_link %}
-    {% endif %}
-
-    {% unless final_tmx %}
         {% for file in site.static_files %}
             {% assign static_name = file.name | downcase %}
+            
             {% if static_name == current_filename | append: ".tmx" %}
-                {% assign final_tmx = file.name %}
+                {% assign found_tmx_file = file.name %}
                 {% break %}
             {% elsif static_name == base_name | append: ".tmx" %}
-                {% assign final_tmx = file.name %}
+                {% assign found_tmx_file = file.name %}
                 {% break %}
             {% endif %}
         {% endfor %}
-    {% endunless %}
 
-    {% if final_tmx or page.source_link or page.transcription_link %}
-    <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+        {% assign final_tmx_target = nil %}
         
-        <strong style="color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;">Source Files:</strong>
-        
-        {% if final_tmx %}
-            <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ final_tmx }}" target="_blank" style="
-                text-decoration: none; 
-                background-color: #f3e5f5; 
-                color: #7b1fa2; 
-                padding: 4px 10px; 
-                border-radius: 4px; 
-                border: 1px solid #e1bee7;
-                font-weight: 700;
-                display: inline-flex;
-                align-items: center;
-                transition: background 0.2s;">
-                👁️ Open Parallel Viewer
-            </a>
+        {% if page.tmx_link %}
+            {% assign final_tmx_target = page.tmx_link %}
+        {% elsif found_tmx_file %}
+            {% assign final_tmx_target = found_tmx_file %}
         {% endif %}
 
-        {% if page.source_link %}
-            {% assign base_asset_path = '/assets/sources/' | relative_url %}
-            {% assign src = page.source_link %}
-            {% unless src contains '://' %}{% assign src = base_asset_path | append: src %}{% endunless %}
-            <a href="{{ src }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
-                🖼️ Original Scan
-            </a>
-        {% endif %}
+        {% if final_tmx_target or page.source_link or page.transcription_link %}
+        <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            
+            <strong style="color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;">Source Files:</strong>
+            
+            {% if final_tmx_target %}
+                <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ final_tmx_target }}" target="_blank" style="
+                    text-decoration: none; 
+                    background-color: #f3e5f5; 
+                    color: #7b1fa2; 
+                    padding: 4px 10px; 
+                    border-radius: 4px; 
+                    border: 1px solid #e1bee7;
+                    font-weight: 700;
+                    display: inline-flex;
+                    align-items: center;
+                    transition: background 0.2s;">
+                    👁️ Open Parallel Viewer
+                </a>
+            {% endif %}
 
-        {% if final_tmx %}
-            {% assign base_asset_path = '/assets/sources/' | relative_url %}
-            {% assign dl_link = final_tmx %}
-            {% unless dl_link contains '://' %}{% assign dl_link = base_asset_path | append: dl_link %}{% endunless %}
-            <a href="{{ dl_link }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
-                💾 Raw <abbr title="File format for translations">TMX</abbr>
-            </a>
-        {% endif %}
+            {% if page.source_link %}
+                {% assign src = page.source_link %}
+                {% unless src contains '://' %}{% assign src = base_asset_path | append: src %}{% endunless %}
+                <a href="{{ src }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                    🖼️ Original Scan
+                </a>
+            {% endif %}
 
-        {% if page.transcription_link %}
-            {% assign base_asset_path = '/assets/sources/' | relative_url %}
-            {% assign txt = page.transcription_link %}
-            {% unless txt contains '://' %}{% assign txt = base_asset_path | append: txt %}{% endunless %}
-            <a href="{{ txt }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
-                📝 Raw Text
-            </a>
-        {% endif %}
+            {% if final_tmx_target %}
+                {% assign dl_link = final_tmx_target %}
+                {% unless dl_link contains '://' %}{% assign dl_link = base_asset_path | append: dl_link %}{% endunless %}
+                <a href="{{ dl_link }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                    💾 TMX Data
+                </a>
+            {% endif %}
 
-    </div>
-    {% endif %}
+            {% if page.transcription_link %}
+                {% assign txt = page.transcription_link %}
+                {% unless txt contains '://' %}{% assign txt = base_asset_path | append: txt %}{% endunless %}
+                <a href="{{ txt }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                    📝 Raw Text
+                </a>
+            {% endif %}
+
+        </div>
+        {% endif %}
     </header>
 
     <div class="post-content">
         {{ content }}
     </div>
-    
-    <hr class="fencing-divider" style="margin: 3rem 0; border: 0; border-top: 1px solid #eee;">
 
+    <hr class="fencing-divider" style="margin: 3rem 0; border: 0; border-top: 1px solid #eee;">
     {% include version_links.html %}
 
     {% if page.author %}
