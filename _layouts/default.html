@@ -88,7 +88,7 @@
     
     {% comment %} 2. SCAN ALL POSTS FOR MATCHING PREFIX {% endcomment %}
 {% for post in site.posts %}
-    {% assign post_name_base = post.name | remove: '.md' %}
+    {% assign post_name_base = post.basename %}
     
     {% comment %} Define the minimum length a companion must have to be valid {% endcomment %}
     {% assign min_length = unique_id_prefix | size | plus: 3 %}
