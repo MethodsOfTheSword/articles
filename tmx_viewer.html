@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (viewerPage) {
         const editWrapper = document.createElement('div');
         editWrapper.className = 'edit-on-github-root';
-        editWrapper.innerHTML = `<a class="edit-on-github-link" href="${GH_EDIT_BASE + encodeURIComponent(fileName)}#L1" target="_blank" rel="noopener">✎ Edit this TMX on GitHub</a>`;
+        editWrapper.innerHTML = `<a class="edit-on-github-link" href="${GH_EDIT_BASE + encodeURIComponent(fileName)}#L1" target="_blank" rel="noopener">✎ Request edit through GitHub</a>`;
         // insert after the source-bar for visibility
         const sourceBar = document.querySelector('.source-bar');
         if (sourceBar && sourceBar.parentNode) sourceBar.parentNode.insertBefore(editWrapper, sourceBar.nextSibling);
