@@ -2,27 +2,29 @@
 layout: default
 title: "Methods of the Sword Archive"
 ---
-<h1 class="page-heading">{{ page.title }}</h1>
-<p class="newthought">Welcome.</p>
-<p>This is an archive of articles about fencing. </p>
+<article class="post-container">
+  <h1 class="page-heading">{{ page.title }}</h1>
+  <p class="newthought">Welcome.</p>
+  <p>This is an archive of articles about fencing. </p>
 
-<hr>
+  <hr>
 
-<h2>Articles & Translations</h2>
+  <h2>Articles & Translations</h2>
 
-<ul>
-  {% for post in site.posts %}
-    <li style="margin-bottom: 1.5rem;">
-      <span style="font-family: 'Consolas', monospace; font-size: 0.9rem; color: #666; display:inline-block; width: 110px;">
-          {{ post.date | date: "%Y-%m-%d" }}
-      </span>
-      <a href="{{ post.url | relative_url }}" style="font-size: 1.2rem; font-weight: bold;">
-          {{ post.title }}
-      </a>
-      <br>
-      <span style="font-size: 1rem; color: #444; margin-left: 114px; display: block;">
-          {{ post.description }}
-      </span>
-    </li>
-  {% endfor %}
-</ul>
+  <ul>
+    {% for post in site.posts %}
+      <li style="margin-bottom: 1.5rem;">
+        <span style="font-family: 'Consolas', monospace; font-size: 0.9rem; color: #666; display:inline-block; width: 110px;">
+            {{ post.date | date: "%Y-%m-%d" }}
+        </span>
+        <a href="{{ post.url | relative_url }}" style="font-size: 1.2rem; font-weight: bold;">
+            {{ post.title }}
+        </a>
+        <br>
+        <span style="font-size: 1rem; color: #444; margin-left: 114px; display: block;">
+            {{ post.description }}
+        </span>
+      </li>
+    {% endfor %}
+  </ul>
+</article>
