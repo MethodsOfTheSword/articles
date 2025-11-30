@@ -6,3 +6,4 @@ url: "https://methodsofthesword.github.io"
 baseurl: "/articles" # MUST match your repository name
 markdown: kramdown
 permalink: /:year/:month/:day/:title/
+baseurl: "/articles"
