@@ -73,25 +73,19 @@
 
     {% if article_type == 'translation' %}
         
-    {% assign post_date = page.date | date: "%Y-%m-%d" %}
-    {% assign base_slug = page.slug %} 
+    {% comment %} 1. Define the Unique ID based on confirmed working variables {% endcomment %}
+{% assign post_date = page.date | date: "%Y-%m-%d" %}
+{% assign base_slug = page.slug %} 
+{% assign unique_id_prefix = post_date | append: "-" | append: base_slug | append: "-" %} 
+{% comment %} This calculates the guaranteed search string: YYYY-MM-DD-slug- {% endcomment %}
 
-    {% comment %} This calculates the unique ID for the search: YYYY-MM-DD-slug- {% endcomment %}
-    {% assign unique_id_prefix = post_date | append: "-" | append: base_slug | append: "-" %} 
-
-    {% assign found_links = false %}    
-
+{% assign found_links = false %}
 
 <div class="language-switcher" style="text-align: center; margin: 3rem 0 1rem 0;">
     <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #8b0000; font-weight: bold;">
         View Other Versions:
     </span>
     
-    <h3 style="color:red; margin-top: 50px;">DEBUG RAW FILENAME: {{ page.name }}</h3>
-<h3 style="color:red;">DEBUG TOTAL POSTS FOUND: {{ site.posts | size }}</h3>
-<h3 style="color:red;">DEBUG RAW DATE: {{ page.date | date: "%Y-%m-%d" }}</h3>
-
-
     {% comment %} 2. SCAN ALL POSTS FOR MATCHING PREFIX {% endcomment %}
     {% for post in site.posts %}
         {% assign post_name_base = post.name | remove: '.md' %}
@@ -101,13 +95,13 @@
             
             {% assign found_links = true %}
             
-            {% comment %} The rest of the logic (suffix analysis) is correct {% endcomment %}
+            {% comment %} Extract the suffix (e.g., transcription_it) {% endcomment %}
             {% assign suffix = post_name_base | remove: unique_id_prefix %}
             {% assign lang_code = suffix | split: "_" | last %}
             
             <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
                 
-                {% comment %} LABEL LOGIC: Checks the suffix for role {% endcomment %}
+                {% comment %} LABEL LOGIC: Check the suffix for role {% endcomment %}
                 {% if suffix contains "transcription_" %}
                     📝 Original {{ lang_code | upcase }} Transcription
                 {% elsif suffix contains "translation_" %}
@@ -118,11 +112,9 @@
         {% endif %}
     {% endfor %}
     
-    {% comment %} 3. ADD FALLBACK LINK TO ENGLISH DEFAULT (If we are viewing a secondary page) {% endcomment %}
+    {% comment %} 3. ADD FALLBACK LINK TO ENGLISH DEFAULT (If viewing a secondary page) {% endcomment %}
     {% if page.name contains "-translation_" or page.name contains "-transcription_" %}
-        {% assign post_date = page.date | date: "%Y-%m-%d" %}
-        {% assign core_slug = page.slug | remove: "translation" | remove: "transcription" | remove: page.lang_code | remove: "-" %}
-        {% assign english_default_filename = post_date | append: "-" | append: core_slug | append: ".md" %}
+        {% assign english_default_filename = post_date | append: "-" | append: base_slug | append: ".md" %}
         
         {% for post in site.posts %}
             {% if post.name == english_default_filename %}
