@@ -275,9 +275,9 @@ blockquote {
 }
 
 .post-title {
-    font-size: 1.2rem;
+    /* font-size: 1.8rem;
     font-weight: bold;
-    color: var(--accent-color);
+    color: var(--accent-color); */
 }
 
 .post-description {
