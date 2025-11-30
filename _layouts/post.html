@@ -1,90 +1,83 @@
-<div class="article-versions" style="background-color: #fafafa; padding: 1.5rem; border-radius: 5px; margin-top: 2rem; border: 1px solid #eee;">
-  
-  {% assign current_slug = page.slug %}
-  {% assign base_slug = current_slug %}
-  {% assign is_variant = false %}
+---
+layout: default
+---
+<article class="post-container">
 
-  {% if current_slug contains "-transcription_" %}
-    {% assign is_variant = true %}
-    {% assign parts = current_slug | split: "-transcription_" %}
-    {% assign base_slug = parts[0] %}
-  {% elsif current_slug contains "-transcript_" %}
-    {% assign is_variant = true %}
-    {% assign parts = current_slug | split: "-transcript_" %}
-    {% assign base_slug = parts[0] %}
-  {% elsif current_slug contains "-translation_" %}
-    {% assign is_variant = true %}
-    {% assign parts = current_slug | split: "-translation_" %}
-    {% assign base_slug = parts[0] %}
-  {% endif %}
+    <div style="margin-bottom: 40px; font-family: sans-serif; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">
+        <a href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">&larr; Back to Archive</a>
+    </div>
 
-  {% if is_variant == true %}
-    {% assign original = site.posts | where: "slug", base_slug | first %}
-    {% if original %}
-      <p style="margin-bottom: 0;">
-        <strong>&larr; Return to Original:</strong> <a href="{{ original.url | relative_url }}">{{ original.title }}</a>
-      </p>
+    {% if page.is_translation %}
+    <div style="margin-bottom: 10px;">
+        <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
+            Translation
+        </span>
+    </div>
     {% endif %}
-  
-  {% else %}
 
-    {% capture internal_transcripts %}
-      {% for post in site.posts %}
-        {% if post.slug contains base_slug and post.slug != base_slug %}
-            
-            {% if post.slug contains "-transcription_" %}
-                {% assign lang_code = post.slug | split: "-transcription_" | last %}
-                <li><a href="{{ post.url | relative_url }}">Transcription ({{ lang_code | upcase }})</a></li>
-            
-            {% elsif post.slug contains "-transcript_" %}
-                {% assign lang_code = post.slug | split: "-transcript_" | last %}
-                <li><a href="{{ post.url | relative_url }}">Transcription ({{ lang_code | upcase }})</a></li>
-            {% endif %}
-
+    <header>
+        <h1 class="post-title">{{ page.title }}</h1>
+        {% if page.subtitle %}
+        <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
+            {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
+        </div>
         {% endif %}
-      {% endfor %}
-    {% endcapture %}
+    </header>
 
-    {% capture ext_transcripts %}
-      {% if page.external_transcripts %}
-        {% for item in page.external_transcripts %}
-          <li><a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a></li>
-        {% endfor %}
-      {% endif %}
-    {% endcapture %}
+    {% if page.source_link or page.transcription_link or page.tmx_link %}
+    <div class="download-bar" style="background: #f9f9f9; padding: 15px; border-left: 4px solid #8b0000; margin-bottom: 30px;">
+        <span style="font-weight: bold; margin-right: 10px; color: #333;">Assets:</span>
+        
+        {% assign base_asset_path = '/assets/sources/' | relative_url %}
 
-    {% capture internal_translations %}
-      {% for post in site.posts %}
-        {% if post.slug contains base_slug and post.slug contains "-translation_" %}
-           {% assign lang_code = post.slug | split: "-translation_" | last %}
-           <li><a href="{{ post.url | relative_url }}">Translation ({{ lang_code | upcase }})</a></li>
+        {% if page.source_link %}
+            {% assign src = page.source_link %}
+            {% unless src contains '://' %}{% assign src = base_asset_path | append: src %}{% endunless %}
+            
+            <a href="{{ src }}" target="_blank" style="margin-right: 15px; text-decoration: none; color: #8b0000;">
+                🖼️ {{ page.source_label | default: "Original Source" }}
+            </a>
         {% endif %}
-      {% endfor %}
-    {% endcapture %}
 
-    {% capture ext_translations %}
-      {% if page.external_translations %}
-        {% for item in page.external_translations %}
-          <li><a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a></li>
-        {% endfor %}
-      {% endif %}
-    {% endcapture %}
+        {% if page.transcription_link %}
+            {% assign txt = page.transcription_link %}
+            {% unless txt contains '://' %}{% assign txt = base_asset_path | append: txt %}{% endunless %}
+            
+            <a href="{{ txt }}" target="_blank" style="margin-right: 15px; text-decoration: none; color: #8b0000;">
+                📝 {{ page.transcription_label | default: "Transcription File" }}
+            </a>
+        {% endif %}
 
-    {% if internal_transcripts contains "<li>" or ext_transcripts contains "<li>" %}
-      <p style="margin-bottom: 0.5rem;"><strong>Transcriptions available:</strong></p>
-      <ul style="margin-top: 0;">
-        {{ internal_transcripts }}
-        {{ ext_transcripts }}
-      </ul>
+        {% if page.tmx_link %}
+            {% assign tmx = page.tmx_link %}
+            {% unless tmx contains '://' %}{% assign tmx = base_asset_path | append: tmx %}{% endunless %}
+            
+            <a href="{{ tmx }}" download style="text-decoration: none; color: #8b0000;">
+                💾 {{ page.tmx_label | default: "Download TMX" }}
+            </a>
+        {% endif %}
+    </div>
     {% endif %}
 
-    {% if internal_translations contains "<li>" or ext_translations contains "<li>" %}
-      <p style="margin-bottom: 0.5rem;"><strong>Translations available:</strong></p>
-      <ul style="margin-top: 0;">
-        {{ internal_translations }}
-        {{ ext_translations }}
-      </ul>
-    {% endif %}
+    <div class="post-content">
+        {{ content }}
+    </div>
 
-  {% endif %}
+    <div style="background: red; color: white; padding: 10px;">
+  DEBUG: The Post Layout is loading.
+  <br>
+  Current Slug: {{ page.slug }}
 </div>
+
+
+    <hr class="fencing-divider" style="margin: 3rem 0; border: 0; border-top: 1px solid #eee;">
+
+    {% include version_links.html %}
+
+    {% if page.author %}
+    <div style="text-align: right; margin-top: 60px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+        {{ page.author }}
+    </div>
+    {% endif %}
+
+</article>
