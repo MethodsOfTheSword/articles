@@ -4,7 +4,11 @@
   {% assign base_slug = current_slug %}
   {% assign is_variant = false %}
 
-  {% if current_slug contains "-transcript_" %}
+  {% if current_slug contains "-transcription_" %}
+    {% assign is_variant = true %}
+    {% assign parts = current_slug | split: "-transcription_" %}
+    {% assign base_slug = parts[0] %}
+  {% elsif current_slug contains "-transcript_" %}
     {% assign is_variant = true %}
     {% assign parts = current_slug | split: "-transcript_" %}
     {% assign base_slug = parts[0] %}
@@ -14,32 +18,29 @@
     {% assign base_slug = parts[0] %}
   {% endif %}
 
-
   {% if is_variant == true %}
-    
     {% assign original = site.posts | where: "slug", base_slug | first %}
-    
     {% if original %}
       <p style="margin-bottom: 0;">
-        <strong>&larr; Return to Original:</strong> 
-        <a href="{{ original.url }}">{{ original.title }}</a>
-      </p>
-    {% else %}
-      <p style="margin-bottom: 0;">
-        <strong>&larr; Return to Main Article</strong> (Parent file not found)
+        <strong>&larr; Return to Original:</strong> <a href="{{ original.url | relative_url }}">{{ original.title }}</a>
       </p>
     {% endif %}
   
-
   {% else %}
 
     {% capture internal_transcripts %}
       {% for post in site.posts %}
-        {% if post.slug contains base_slug and post.slug contains "-transcript_" %}
-           {% assign lang_code = post.slug | split: "-transcript_" | last %}
-           <li>
-             <a href="{{ post.url }}">Transcription ({{ lang_code | upcase }})</a>
-           </li>
+        {% if post.slug contains base_slug and post.slug != base_slug %}
+            
+            {% if post.slug contains "-transcription_" %}
+                {% assign lang_code = post.slug | split: "-transcription_" | last %}
+                <li><a href="{{ post.url | relative_url }}">Transcription ({{ lang_code | upcase }})</a></li>
+            
+            {% elsif post.slug contains "-transcript_" %}
+                {% assign lang_code = post.slug | split: "-transcript_" | last %}
+                <li><a href="{{ post.url | relative_url }}">Transcription ({{ lang_code | upcase }})</a></li>
+            {% endif %}
+
         {% endif %}
       {% endfor %}
     {% endcapture %}
@@ -47,12 +48,7 @@
     {% capture ext_transcripts %}
       {% if page.external_transcripts %}
         {% for item in page.external_transcripts %}
-          <li>
-            <a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a>
-            {% if item.note %}
-              <span style="color:#777; font-style:italic; font-size: 0.9em;"> — {{ item.note }}</span>
-            {% endif %}
-          </li>
+          <li><a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a></li>
         {% endfor %}
       {% endif %}
     {% endcapture %}
@@ -61,9 +57,7 @@
       {% for post in site.posts %}
         {% if post.slug contains base_slug and post.slug contains "-translation_" %}
            {% assign lang_code = post.slug | split: "-translation_" | last %}
-           <li>
-             <a href="{{ post.url }}">Translation ({{ lang_code | upcase }})</a>
-           </li>
+           <li><a href="{{ post.url | relative_url }}">Translation ({{ lang_code | upcase }})</a></li>
         {% endif %}
       {% endfor %}
     {% endcapture %}
@@ -71,21 +65,12 @@
     {% capture ext_translations %}
       {% if page.external_translations %}
         {% for item in page.external_translations %}
-          <li>
-            <a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a>
-            {% if item.note %}
-              <span style="color:#777; font-style:italic; font-size: 0.9em;"> — {{ item.note }}</span>
-            {% endif %}
-          </li>
+          <li><a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a></li>
         {% endfor %}
       {% endif %}
     {% endcapture %}
 
-
-    {% assign int_trans_size = internal_transcripts | strip_newlines | size %}
-    {% assign ext_trans_size = ext_transcripts | strip_newlines | size %}
-    
-    {% if int_trans_size > 0 or ext_trans_size > 0 %}
+    {% if internal_transcripts contains "<li>" or ext_transcripts contains "<li>" %}
       <p style="margin-bottom: 0.5rem;"><strong>Transcriptions available:</strong></p>
       <ul style="margin-top: 0;">
         {{ internal_transcripts }}
@@ -93,10 +78,7 @@
       </ul>
     {% endif %}
 
-    {% assign int_transl_size = internal_translations | strip_newlines | size %}
-    {% assign ext_transl_size = ext_translations | strip_newlines | size %}
-
-    {% if int_transl_size > 0 or ext_transl_size > 0 %}
+    {% if internal_translations contains "<li>" or ext_translations contains "<li>" %}
       <p style="margin-bottom: 0.5rem;"><strong>Translations available:</strong></p>
       <ul style="margin-top: 0;">
         {{ internal_translations }}
@@ -104,25 +86,5 @@
       </ul>
     {% endif %}
 
-    {% if int_trans_size == 0 and ext_trans_size == 0 and int_transl_size == 0 and ext_transl_size == 0 %}
-       <p style="color: #999; font-style: italic; font-size: 0.9rem;">No other versions available.</p>
-    {% endif %}
-
   {% endif %}
-</div>
-
-<div style="background: yellow; border: 1px solid black; padding: 10px; margin-bottom: 20px;">
-  <strong>DEBUG INFO:</strong><br>
-  Current Slug: [{{ current_slug }}]<br>
-  Calculated Base Slug: [{{ base_slug }}]<br>
-  Is Variant? {{ is_variant }}<br>
-  
-  <strong>Searching for matches...</strong><br>
-  <ul>
-  {% for post in site.posts %}
-    {% if post.slug contains base_slug %}
-       <li>Found match: {{ post.slug }}</li>
-    {% endif %}
-  {% endfor %}
-  </ul>
 </div>
