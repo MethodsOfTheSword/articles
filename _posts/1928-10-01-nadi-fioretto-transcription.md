@@ -1,3 +1,11 @@
+---
+layout: default
+title: "The Correct Grip of the Foil"
+date: 1928-10-01
+article_type: translation
+hidden: false
+---
+
 **Ecco come Nedo Nadi impugna il fioretto.**
 
 # COME SI IMPUGNA IL FIORETTO

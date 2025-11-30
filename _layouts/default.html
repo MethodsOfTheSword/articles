@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }} | {{ site.title }}</title>
-    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}"> 
 </head>
 <body>
 
 <article>
-    {% if page.url != "/" %}
     <div style="margin-bottom: 40px; font-family: sans-serif; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">
-        <a href="{{ '/' | relative_url }}">← Back to Archive</a>
+        {% if page.url != "/" %}
+            <a href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">← Back to Archive</a>
+        {% endif %}
     </div>
-    {% endif %}
-
+    
     {% if page.title %}
     <h1>{{ page.title }}</h1>
     {% endif %}
@@ -25,14 +25,120 @@
     </div>
     {% endif %}
 
-    {{ content }}
+    {% assign article_type = page.article_type | default: 'analysis' %}
+
+    {% if article_type == 'translation' %}
+        
+        {% if page.source_link or page.transcription_link or page.tmx_link %}
+        <div class="download-bar">
+            <span class="download-label">Archive Assets:</span>
+            
+            {% comment %} Helper block for clean linking {% endcomment %}
+            {% assign base_assets_url = '/assets/sources/' | relative_url %}
+            
+            {% if page.source_link %}
+                {% assign src_url = page.source_link %}
+                {% unless src_url contains 'http' %}{% assign src_url = base_assets_url | append: page.source_link %}{% endunless %}
+                
+                <a href="{{ src_url }}" target="_blank" class="dl-link">
+                    🖼️ {{ page.source_label | default: "Original Source" }}
+                </a>
+            {% endif %}
+
+            {% if page.transcription_link %}
+                {% assign txt_url = page.transcription_link %}
+                {% unless txt_url contains 'http' or txt_url contains '/' %}{% assign txt_url = base_assets_url | append: page.transcription_link %}{% endunless %}
+                
+                <a href="{{ txt_url }}" target="_blank" class="dl-link">
+                    📝 {{ page.transcription_label | default: "Transcription" }}
+                </a>
+            {% endif %}
+
+            {% if page.tmx_link %}
+                <a href="{{ base_assets_url }}{{ page.tmx_link }}" download class="dl-link">
+                    💾 TMX
+                </a>
+            {% endif %}
+            
+        </div>
+        <hr class="fencing-divider">
+        {% endif %}
+    {% endif %}
+
+    <div class="post-content">
+        {{ content }}
+    </div>
+
+    <hr class="fencing-divider">
+
+    {% if article_type == 'translation' %}
+        
+        {% comment %} 1. Define the unique base ID based on the current article's slug {% endcomment %}
+        {% assign post_date = page.date | date: "%Y-%m-%d" %}
+        {% assign unique_id_prefix = post_date | append: "-" | append: page.slug | append: "-" %} 
+        
+        {% assign found_links = false %}
+
+        <div class="language-switcher" style="text-align: center; margin: 3rem 0 1rem 0;">
+            <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #8b0000; font-weight: bold;">
+                View Other Versions:
+            </span>
+            
+            {% comment %} 2. SCAN ALL POSTS FOR MATCHING PREFIX {% endcomment %}
+            {% for post in site.posts %}
+                {% assign post_name = post.name | remove: ".md" %}
+                
+                {% if post_name contains unique_id_prefix and post.url != page.url %}
+                    
+                    {% assign found_links = true %}
+                    
+                    {% comment %} Extract the suffix (e.g., transcription_it) {% endcomment %}
+                    {% assign suffix = post_name | remove: unique_id_prefix %}
+                    {% assign lang_code = suffix | split: "_" | last %}
+                    
+                    <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
+                        
+                        {% comment %} LABEL LOGIC: Analyze the suffix for role {% endcomment %}
+                        {% if suffix contains "transcription_" %}
+                            📝 Original {{ lang_code | upcase }} Transcription
+                        {% elsif suffix contains "translation_" %}
+                            🇫🇷 {{ lang_code | upcase }} Translation
+                        {% endif %}
+
+                    </a>
+                {% endif %}
+            {% endfor %}
+            
+            {% comment %} 3. ADD FALLBACK LINK TO ENGLISH DEFAULT (If we are viewing a secondary page) {% endcomment %}
+            {% if page.lang_code %}
+                {% assign english_default_filename = post_date | append: "-" | append: page.slug | remove: "-translation" | remove: "-transcription" | remove: page.lang_code | remove: '-' | append: ".md" %}
+                
+                {% for post in site.posts %}
+                    {% if post.name == english_default_filename %}
+                        <a href="{{ post.url | relative_url }}" class="dl-link" style="background: white; border: none; font-size: 1rem; color: #333;">
+                            🇺🇸 English Translation
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            {% comment %} 4. MESSAGE IF NOTHING WAS FOUND (Only display if we are on the main article) {% endcomment %}
+            {% unless found_links or page.name contains "-translation_" or page.name contains "-transcription_" %}
+                <p style="text-align: center; font-size: 0.9rem; color: #888;">No companion versions found.</p>
+            {% endunless %}
+
+        </div>
+    {% endif %}
 
     {% if page.author %}
     <div style="text-align: right; margin-top: 60px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
         {{ page.author }}
     </div>
     {% endif %}
-
+    
+    <footer style="text-align: center; font-size: 0.8rem; margin-top: 80px; color: #666; border-top: 1px solid #eee; padding-top: 20px;">
+        &copy; {{ site.time | date: '%Y' }} {{ site.author }}. All Rights Reserved.
+    </footer>
 </article>
 
 </body>
