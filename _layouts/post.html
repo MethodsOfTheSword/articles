@@ -38,7 +38,9 @@ layout: default
         </div>
         {% endif %}
 
-        {% assign current_filename = page.path | split: '/' | last | replace: '.md', '' | downcase %}
+        {% assign base_asset_path = '/assets/sources/' | relative_url %}
+        
+        {% assign current_filename = page.path | split: '/' | last | replace: '.md', '' | downcase | strip %}
         {% assign base_name = current_filename %}
         
         {% if base_name contains "-translation_" %}
@@ -47,35 +49,18 @@ layout: default
             {% assign base_name = base_name | split: "-transcript_" | first %}
         {% endif %}
 
-        {% assign base_asset_path = '/assets/sources/' | relative_url %}
-        <div style="background: #222; color: #0f0; padding: 15px; margin: 20px 0; border: 4px solid red; font-family: monospace; font-size: 0.85rem;">
-  <strong>🔎 DEBUGGING FILENAME MATCH</strong>
-  <br>-------------------------------------------
-  <br><strong>1. YOUR POST VARIABLES:</strong>
-  <br>Page Path:        [{{ page.path }}]
-  <br>Current Filename: [{{ current_filename }}]
-  <br>Base Name:        [{{ base_name }}]
-  <br>Looking for:      [{{ current_filename }}.tmx]
-  <br>
-  <br><strong>2. CHECKING ASSETS FOLDER:</strong>
-  {% for file in site.static_files %}
-    {% if file.extname == ".tmx" or file.extname == ".TMX" %}
-      {% assign static_name = file.name | downcase %}
-      <br>File Found: [{{ static_name }}]
-      <br>&nbsp;&nbsp;Compare: [{{ static_name }}] == [{{ current_filename | append: ".tmx" }}] ? 
-      {% if static_name == current_filename | append: ".tmx" %}✅ YES{% else %}❌ NO{% endif %}
-    {% endif %}
-  {% endfor %}
-</div>
+        {% assign target_tmx_1 = current_filename | append: ".tmx" %}
+        {% assign target_tmx_2 = base_name | append: ".tmx" %}
+        
         {% assign found_tmx_file = nil %}
 
         {% for file in site.static_files %}
-            {% assign static_name = file.name | downcase %}
+            {% assign static_name = file.name | downcase | strip %}
             
-            {% if static_name == current_filename | append: ".tmx" %}
+            {% if static_name == target_tmx_1 %}
                 {% assign found_tmx_file = file.name %}
                 {% break %}
-            {% elsif static_name == base_name | append: ".tmx" %}
+            {% elsif static_name == target_tmx_2 %}
                 {% assign found_tmx_file = file.name %}
                 {% break %}
             {% endif %}
