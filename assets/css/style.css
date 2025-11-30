@@ -51,24 +51,35 @@ a { color: var(--accent-color); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* --- 3. LISTS (Bulleted & Numbered) --- */
-/* Unordered Lists (Bullets) */
+/* Unordered Lists (Bulleted) — use native markers globally for best compatibility.
+   Apply the Tufte-style inline bullet layout only inside article content where needed. */
 ul {
-    list-style-type: none; /* Remove default ugly bullets */
+    /* Keep default/native list markers (disc/circle) and spacing for broad browser support */
+    list-style-position: outside;
     padding-left: 1.5rem;
     margin-bottom: 1.5rem;
 }
 
-ul li {
-    display: flex;             /* Turn on the alignment engine */
+/* Tufte-style lists (styled bullet) scoped to article content to avoid mobile Safari issues
+   with flex-based list items applied globally. */
+article ul li {
+    display: flex;             /* Turn on the alignment engine inside article body */
     align-items: baseline;     /* Align the "feet" of the text with the bullet */
     margin-bottom: 0.5rem;
 }
 
-ul li::before {
-    content: "▪"; 
+article ul li::before {
+    content: "▪";
     color: var(--accent-color);
     font-size: 1.2rem;
     margin-right: 1rem;
+}
+
+/* Small-screen fallback: stack list items so bullets and wrapped lines don't misalign on phones.
+   This addresses Safari mobile rendering where flex-baseline behavior can look off. */
+@media (max-width: 640px) {
+    article ul li { display: block; }
+    article ul li::before { display: inline-block; margin-right: 0.6rem; }
 }
 
 /* Ordered Lists (Numbers) */
