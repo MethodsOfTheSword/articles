@@ -7,24 +7,45 @@ layout: default
         <a href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">&larr; Back to Archive</a>
     </div>
 
+{% assign show_transcript = false %}
+    {% assign badge_lang = nil %}
+
     {% if page.slug contains "-transcript_" or page.slug contains "-transcription_" %}
+        {% assign show_transcript = true %}
         {% if page.slug contains "-transcription_" %}
             {% assign badge_lang = page.slug | split: "-transcription_" | last | upcase %}
         {% else %}
             {% assign badge_lang = page.slug | split: "-transcript_" | last | upcase %}
         {% endif %}
+    {% elsif page.is_transcription or page.is_transcript %}
+        {% assign show_transcript = true %}
+        {% if page.lang %}{% assign badge_lang = page.lang | upcase %}{% endif %}
+    {% endif %}
+
+    {% if show_transcript %}
         <div style="margin-bottom: 10px;">
             <span style="background-color: #fff3e0; color: #e65100; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
-                Transcription ({{ badge_lang }})
+                Transcription{% if badge_lang %} ({{ badge_lang }}){% endif %}
             </span>
         </div>
     {% endif %}
 
+
+    {% assign show_translation = false %}
+    {% assign trans_lang = nil %}
+
     {% if page.slug contains "-translation_" %}
-        {% assign badge_lang = page.slug | split: "-translation_" | last | upcase %}
+        {% assign show_translation = true %}
+        {% assign trans_lang = page.slug | split: "-translation_" | last | upcase %}
+    {% elsif page.is_translation %}
+        {% assign show_translation = true %}
+        {% if page.lang %}{% assign trans_lang = page.lang | upcase %}{% endif %}
+    {% endif %}
+
+    {% if show_translation %}
         <div style="margin-bottom: 10px;">
             <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
-                Translation ({{ badge_lang }})
+                Translation{% if trans_lang %} ({{ trans_lang }}){% endif %}
             </span>
         </div>
     {% endif %}
@@ -38,27 +59,7 @@ layout: default
         </div>
         {% endif %}
 
-        {% if page.slug contains "-transcript_" or page.slug contains "-transcription_" %}
-        {% if page.slug contains "-transcription_" %}
-            {% assign badge_lang = page.slug | split: "-transcription_" | last | upcase %}
-        {% else %}
-            {% assign badge_lang = page.slug | split: "-transcript_" | last | upcase %}
-        {% endif %}
-        <div style="margin-bottom: 10px;">
-            <span style="background-color: #fff3e0; color: #e65100; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
-                Transcription ({{ badge_lang }})
-            </span>
-        </div>
-    {% endif %}
-
-    {% if page.slug contains "-translation_" %}
-        {% assign badge_lang = page.slug | split: "-translation_" | last | upcase %}
-        <div style="margin-bottom: 10px;">
-            <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
-                Translation ({{ badge_lang }})
-            </span>
-        </div>
-    {% endif %}
+        
 
         {% assign base_asset_path = '/assets/sources/' | relative_url %}
         
