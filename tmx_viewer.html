@@ -1,29 +1,34 @@
 ---
 layout: default
 title: "Universal TMX Viewer"
-permalink: /tmx_viewer/
+permalink: /viewer/
 ---
 
 <div class="tmx-viewer-page" style="max-width: 900px; margin: 0 auto;">
 
-    <div class="back-nav">
-        <a href="{{ '/' | relative_url }}">&larr; Back to Archive</a>
+    <div class="back-nav" style="margin-bottom: 20px;">
+        <a id="smart-back-btn" href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">
+            &larr; Back to Archive
+        </a>
     </div>
 
     <div style="margin-bottom: 10px;">
         <span style="background-color: #f3e5f5; color: #7b1fa2; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
-            Side-by-side Viewer
+            Parallel Text Viewer
         </span>
     </div>
 
-    <h1 id="viewer-title" class="post-title">Loading...</h1>
+    <h1 id="viewer-title" class="post-title">Initializing...</h1>
     
     <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem;">
-        <strong style="color: #333;">File:</strong> <span id="file-name-display" style="font-family: monospace; color: #666;">...</span>
+        <strong style="color: #333;">Source File:</strong> 
+        <a id="file-name-link" href="#" target="_blank" style="font-family: monospace; color: #8b0000; text-decoration: none; border-bottom: 1px dotted #8b0000; transition: color 0.2s; margin-left: 5px;">
+            ...
+        </a>
     </div>
 
     <div id="loading-msg" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
-        Initializing...
+        Starting engine...
     </div>
 
     <div id="tmx-grid" class="tmx-container" style="display: none;">
@@ -31,65 +36,105 @@ permalink: /tmx_viewer/
             <div class="tmx-col-head" id="head-src">Source</div>
             <div class="tmx-col-head" id="head-tgt">Target</div>
         </div>
-        </div>
+    </div>
 
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     
-    // 1. GET PARAMETERS
+    // 1. CONFIG & PARAMETERS
     const urlParams = new URLSearchParams(window.location.search);
     let fileName = urlParams.get('file');
-    
+    const baseUrl = "{{ site.baseurl }}"; 
+    const assetsPath = "{{ '/assets/sources/' | relative_url }}";
+
+    // 2. GET DOM ELEMENTS (And check they exist)
     const msgContainer = document.getElementById("loading-msg");
     const grid = document.getElementById("tmx-grid");
+    const backBtn = document.getElementById("smart-back-btn");
+    const fileLink = document.getElementById("file-name-link");
+    const title = document.getElementById("viewer-title");
 
     if (!fileName) {
-        msgContainer.innerHTML = "No file selected. <a href='/assets/'>Go to File List</a>";
-        document.getElementById("viewer-title").innerText = "No File Selected";
+        msgContainer.innerHTML = "<strong>Error:</strong> No file specified in URL.";
+        title.innerText = "Error";
         return;
     }
 
-    // SECURITY FIX 1: Sanitize the filename immediately. 
-    // Only allow letters, numbers, dashes, underscores, and dots.
-    // This prevents "Directory Traversal" (../../) and XSS characters (< >).
+    // 3. SANITIZE & UPDATE UI
     fileName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, '');
-
-    // Update UI
-    document.getElementById("viewer-title").innerText = fileName.replace(".tmx", "").replace(/[-_]/g, " ");
-    document.getElementById("file-name-display").innerText = fileName;
     
-    const tmxUrl = "{{ '/assets/sources/' | relative_url }}" + fileName;
+    title.innerText = fileName.replace(".tmx", "").replace(/[-_]/g, " ");
+    
+    // Update the clickable file link
+    if (fileLink) {
+        fileLink.innerText = fileName;
+        fileLink.href = assetsPath + fileName;
+    }
 
-    console.log("Loading:", tmxUrl);
+    // 4. SMART BACK BUTTON LOGIC
+    // Regex: YYYY-MM-DD-title.tmx
+    const match = fileName.match(/^(\d{4})-(\d{2})-(\d{2})-(.+)\.tmx$/i);
+    if (match && backBtn) {
+        const postUrl = `${baseUrl}/${match[1]}/${match[2]}/${match[3]}/${match[4]}/`;
+        backBtn.href = postUrl;
+        backBtn.innerHTML = "&larr; Return to Article";
+    }
 
-    // 2. FETCH
+    // 5. FETCH & PARSE
+    const tmxUrl = assetsPath + fileName;
+    console.log("Fetching TMX from:", tmxUrl);
+
     fetch(tmxUrl)
         .then(response => {
-            if (!response.ok) throw new Error("File not found");
+            if (!response.ok) throw new Error("File not found (404)");
             return response.text();
         })
         .then(str => {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(str, "text/xml");
             
-            if (xmlDoc.querySelector("parsererror")) throw new Error("Invalid XML file.");
+            if (xmlDoc.querySelector("parsererror")) throw new Error("Invalid XML content.");
 
+            const header = xmlDoc.getElementsByTagName("header")[0];
             const body = xmlDoc.getElementsByTagName("body")[0];
             const tus = body.getElementsByTagName("tu");
 
             if (!tus || tus.length === 0) throw new Error("Empty TMX file.");
 
-            // 3. AUTO-DETECT LANGUAGES
+            // ===============================================
+            // SMART LANGUAGE DETECTION (HEADER AWARE)
+            // ===============================================
+            
+            // A. Check Header for 'srclang' (e.g., "it")
+            let definedSource = header ? header.getAttribute("srclang") : null;
+            
+            // B. Check First Unit for available languages
             let firstUnit = tus[0].getElementsByTagName("tuv");
-            let detectedSrc = (firstUnit.length >= 1) ? firstUnit[0].getAttribute("xml:lang") : "Source";
-            let detectedTgt = (firstUnit.length >= 2) ? firstUnit[1].getAttribute("xml:lang") : "Target";
+            let langA = (firstUnit.length >= 1) ? firstUnit[0].getAttribute("xml:lang") : "???";
+            let langB = (firstUnit.length >= 2) ? firstUnit[1].getAttribute("xml:lang") : "???";
 
-            document.getElementById("head-src").innerText = detectedSrc;
-            document.getElementById("head-tgt").innerText = detectedTgt;
+            // C. Assign Source vs Target
+            let srcLang = langA;
+            let tgtLang = langB;
 
-            // 4. RENDER LOOP (SECURE)
+            // If the header defines a source, ensure that language is on the Left (Src)
+            if (definedSource) {
+                // If the second language matches the defined source, swap them
+                if (langB.toLowerCase().includes(definedSource.toLowerCase())) {
+                    srcLang = langB;
+                    tgtLang = langA;
+                }
+            }
+
+            // D. Update UI Headers
+            document.getElementById("head-src").innerText = srcLang.toUpperCase() + " ORIGINAL";
+            document.getElementById("head-tgt").innerText = tgtLang.toUpperCase() + " TRANSLATION";
+
+            // ===============================================
+            // RENDER LOOP
+            // ===============================================
             for (let i = 0; i < tus.length; i++) {
                 let tu = tus[i];
                 let tuvs = tu.getElementsByTagName("tuv");
@@ -99,10 +144,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 for (let j = 0; j < tuvs.length; j++) {
                     let lang = tuvs[j].getAttribute("xml:lang");
                     let seg = tuvs[j].getElementsByTagName("seg")[0];
-                    let text = seg ? seg.textContent : ""; // .textContent strips HTML tags automatically
+                    let text = seg ? seg.textContent : "";
 
-                    if (lang === detectedSrc) srcText = text;
-                    else if (lang === detectedTgt) tgtText = text;
+                    // Fuzzy Match (Case insensitive + Partial)
+                    if (lang.toLowerCase().includes(srcLang.toLowerCase())) srcText = text;
+                    else if (lang.toLowerCase().includes(tgtLang.toLowerCase())) tgtText = text;
+                    // Fallbacks
                     else if (!srcText) srcText = text;
                     else if (!tgtText) tgtText = text;
                 }
@@ -110,15 +157,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 let row = document.createElement("div");
                 row.className = "tmx-row";
                 
-                // SECURITY FIX 2: Build elements safely instead of using innerHTML strings
-                
                 const srcCell = document.createElement("div");
                 srcCell.className = "tmx-cell source";
-                srcCell.textContent = srcText; // Safe!
+                srcCell.textContent = srcText;
                 
                 const tgtCell = document.createElement("div");
                 tgtCell.className = "tmx-cell target";
-                tgtCell.textContent = tgtText; // Safe!
+                tgtCell.textContent = tgtText;
 
                 row.appendChild(srcCell);
                 row.appendChild(tgtCell);
@@ -130,14 +175,13 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(err => {
             msgContainer.style.color = "red";
-            // SECURITY FIX 3: Use innerText for error messages
             msgContainer.innerText = "Error: " + err.message;
         });
 });
 </script>
 
 <style>
-    /* Reuse the same CSS from the layout here */
+    /* Minimal Styles for the grid */
     .tmx-container { border-top: 2px solid #8b0000; font-family: "Georgia", serif; }
     .tmx-header { display: grid; grid-template-columns: 1fr 1fr; position: sticky; top: 0; background: white; border-bottom: 1px solid #ccc; z-index: 100; }
     .tmx-col-head { padding: 10px; font-weight: bold; color: #8b0000; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; font-family: sans-serif; }
