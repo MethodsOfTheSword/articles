@@ -42,46 +42,70 @@ document.addEventListener("DOMContentLoaded", function() {
     const urlParams = new URLSearchParams(window.location.search);
     let fileName = urlParams.get('file');
     
+    // Config
+    const baseUrl = "{{ site.baseurl }}"; 
+    const assetsPath = "{{ '/assets/sources/' | relative_url }}";
+
     const msgContainer = document.getElementById("loading-msg");
     const grid = document.getElementById("tmx-grid");
+    const backBtn = document.querySelector(".back-nav a");
+    const fileLink = document.getElementById("file-name-link"); // NEW LINK ELEMENT
 
+    // Safety Check
     if (!fileName) {
-        msgContainer.innerHTML = "No file selected. <a href='/assets/'>Go to File List</a>";
-        document.getElementById("viewer-title").innerText = "No File Selected";
+        msgContainer.innerHTML = "<strong>Error:</strong> No file specified.";
         return;
     }
 
-    // SECURITY FIX 1: Sanitize the filename immediately. 
-    // Only allow letters, numbers, dashes, underscores, and dots.
-    // This prevents "Directory Traversal" (../../) and XSS characters (< >).
+    // SECURITY: Sanitize filename
     fileName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, '');
 
-    // Update UI
+    // 2. CONSTRUCT PATHS
+    const tmxUrl = assetsPath + fileName;
+
+    // 3. UI UPDATES
+    // A. Title
     document.getElementById("viewer-title").innerText = fileName.replace(".tmx", "").replace(/[-_]/g, " ");
-    document.getElementById("file-name-display").innerText = fileName;
     
-    const tmxUrl = "{{ '/assets/sources/' | relative_url }}" + fileName;
+    // B. File Link (The Hyperlink Update)
+    fileLink.innerText = fileName;  // Set the text
+    fileLink.href = tmxUrl;         // Set the destination URL
 
-    console.log("Loading:", tmxUrl);
+    // C. Smart Back Button Logic
+    const dateRegex = /^(\d{4})-(\d{2})-(\d{2})-(.+)\.tmx$/i;
+    const match = fileName.match(dateRegex);
 
-    // 2. FETCH
+    if (match) {
+        const year = match[1];
+        const month = match[2];
+        const day = match[3];
+        const slug = match[4];
+        const postUrl = `${baseUrl}/${year}/${month}/${day}/${slug}/`;
+
+        backBtn.href = postUrl;
+        backBtn.innerHTML = "&larr; Return to Article";
+    }
+
+    console.log("Fetching:", tmxUrl);
+
+    // 4. FETCH LOGIC
     fetch(tmxUrl)
         .then(response => {
-            if (!response.ok) throw new Error("File not found");
+            if (!response.ok) throw new Error("File not found (404)");
             return response.text();
         })
         .then(str => {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(str, "text/xml");
             
-            if (xmlDoc.querySelector("parsererror")) throw new Error("Invalid XML file.");
+            if (xmlDoc.querySelector("parsererror")) throw new Error("Invalid XML content.");
 
             const body = xmlDoc.getElementsByTagName("body")[0];
             const tus = body.getElementsByTagName("tu");
 
             if (!tus || tus.length === 0) throw new Error("Empty TMX file.");
 
-            // 3. AUTO-DETECT LANGUAGES
+            // Auto-Detect Languages
             let firstUnit = tus[0].getElementsByTagName("tuv");
             let detectedSrc = (firstUnit.length >= 1) ? firstUnit[0].getAttribute("xml:lang") : "Source";
             let detectedTgt = (firstUnit.length >= 2) ? firstUnit[1].getAttribute("xml:lang") : "Target";
@@ -89,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("head-src").innerText = detectedSrc;
             document.getElementById("head-tgt").innerText = detectedTgt;
 
-            // 4. RENDER LOOP (SECURE)
+            // Render Rows (Securely)
             for (let i = 0; i < tus.length; i++) {
                 let tu = tus[i];
                 let tuvs = tu.getElementsByTagName("tuv");
@@ -99,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 for (let j = 0; j < tuvs.length; j++) {
                     let lang = tuvs[j].getAttribute("xml:lang");
                     let seg = tuvs[j].getElementsByTagName("seg")[0];
-                    let text = seg ? seg.textContent : ""; // .textContent strips HTML tags automatically
+                    let text = seg ? seg.textContent : "";
 
                     if (lang === detectedSrc) srcText = text;
                     else if (lang === detectedTgt) tgtText = text;
@@ -110,15 +134,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 let row = document.createElement("div");
                 row.className = "tmx-row";
                 
-                // SECURITY FIX 2: Build elements safely instead of using innerHTML strings
-                
                 const srcCell = document.createElement("div");
                 srcCell.className = "tmx-cell source";
-                srcCell.textContent = srcText; // Safe!
+                srcCell.textContent = srcText;
                 
                 const tgtCell = document.createElement("div");
                 tgtCell.className = "tmx-cell target";
-                tgtCell.textContent = tgtText; // Safe!
+                tgtCell.textContent = tgtText;
 
                 row.appendChild(srcCell);
                 row.appendChild(tgtCell);
@@ -130,7 +152,6 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(err => {
             msgContainer.style.color = "red";
-            // SECURITY FIX 3: Use innerText for error messages
             msgContainer.innerText = "Error: " + err.message;
         });
 });
