@@ -48,6 +48,25 @@ layout: default
         {% endif %}
 
         {% assign base_asset_path = '/assets/sources/' | relative_url %}
+        <div style="background: #222; color: #0f0; padding: 15px; margin: 20px 0; border: 4px solid red; font-family: monospace; font-size: 0.85rem;">
+  <strong>🔎 DEBUGGING FILENAME MATCH</strong>
+  <br>-------------------------------------------
+  <br><strong>1. YOUR POST VARIABLES:</strong>
+  <br>Page Path:        [{{ page.path }}]
+  <br>Current Filename: [{{ current_filename }}]
+  <br>Base Name:        [{{ base_name }}]
+  <br>Looking for:      [{{ current_filename }}.tmx]
+  <br>
+  <br><strong>2. CHECKING ASSETS FOLDER:</strong>
+  {% for file in site.static_files %}
+    {% if file.extname == ".tmx" or file.extname == ".TMX" %}
+      {% assign static_name = file.name | downcase %}
+      <br>File Found: [{{ static_name }}]
+      <br>&nbsp;&nbsp;Compare: [{{ static_name }}] == [{{ current_filename | append: ".tmx" }}] ? 
+      {% if static_name == current_filename | append: ".tmx" %}✅ YES{% else %}❌ NO{% endif %}
+    {% endif %}
+  {% endfor %}
+</div>
         {% assign found_tmx_file = nil %}
 
         {% for file in site.static_files %}
