@@ -155,16 +155,18 @@ document.addEventListener("DOMContentLoaded", function() {
             // This uses a simple counter: find each '<tu' in the raw text in order
             // and record the 1-based line number. This is deterministic and fast.
             let raw = str; // original fetched text
-            const tuPositions = [];
-            (function computeTuPositions() {
+            // Precompute positions (byte offsets) and line numbers for each '<tu' token.
+            const tuPositions = (function computeTuPositions() {
+                const arr = [];
                 let searchPos = 0;
                 while (true) {
                     const pos = raw.indexOf('<tu', searchPos);
                     if (pos === -1) break;
                     const lineNum = raw.slice(0, pos).split(/\r\n|\r|\n/).length;
-                    tuPositions.push(lineNum);
+                    arr.push({ pos: pos, line: lineNum });
                     searchPos = pos + 3;
                 }
+                return arr;
             })();
 
             for (let i = 0; i < tus.length; i++) {
@@ -199,9 +201,54 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 row.appendChild(srcCell);
                 row.appendChild(tgtCell);
-                // Map this TU to the precomputed <tu> position (if available)
+                // Determine GitHub line: prefer the line of the TARGET language <tuv> (e.g., English)
                 let tuLine = 1;
-                if (tuPositions && tuPositions[i]) tuLine = tuPositions[i];
+                if (tuPositions && tuPositions[i]) {
+                    // default to the <tu> start line
+                    tuLine = tuPositions[i].line;
+
+                    try {
+                        // look inside the textual slice for this <tu> to find a <tuv> with the target language
+                        const startPos = tuPositions[i].pos;
+                        const endPos = (tuPositions[i + 1] && tuPositions[i + 1].pos) ? tuPositions[i + 1].pos : raw.length;
+                        const tuChunk = raw.slice(startPos, endPos);
+
+                        // Find all <tuv ... xml:lang="..." ...> locations inside this tuChunk
+                        const tuvRegex = /<tuv\b([^>]*)>/gi;
+                        let match;
+                        let foundTuvPos = null;
+                        while ((match = tuvRegex.exec(tuChunk)) !== null) {
+                            const attrs = match[1];
+                            const langMatch = attrs.match(/xml:lang\s*=\s*['\"]([^'\"]+)['\"]/i);
+                            const langVal = langMatch ? langMatch[1].toLowerCase() : '';
+                            // If this tuv's lang matches the detected target language, prefer it
+                            if (langVal && tgtLang && langVal.includes(tgtLang.toLowerCase())) {
+                                foundTuvPos = startPos + match.index;
+                                break;
+                            }
+                        }
+
+                        // If not found by exact match, fallback: choose the second <tuv> in the chunk (common pattern)
+                        if (foundTuvPos === null) {
+                            const secondTuv = tuChunk.match(/<tuv\b([^>]*)>/i);
+                            if (secondTuv) {
+                                // attempt to locate the second occurrence
+                                let occ = 0;
+                                tuvRegex.lastIndex = 0;
+                                while ((match = tuvRegex.exec(tuChunk)) !== null) {
+                                    occ += 1;
+                                    if (occ === 2) { foundTuvPos = startPos + match.index; break; }
+                                }
+                            }
+                        }
+
+                        if (foundTuvPos !== null) {
+                            tuLine = raw.slice(0, foundTuvPos).split(/\r\n|\r|\n/).length;
+                        }
+                    } catch (e) {
+                        // if anything goes wrong, leave tuLine as the tu start line
+                    }
+                }
 
                 // Add small per-row edit link that opens GitHub editor at the computed line
                 const editLink = document.createElement('a');
@@ -214,6 +261,66 @@ document.addEventListener("DOMContentLoaded", function() {
                 // append edit link to the target cell (right side)
                 tgtCell.appendChild(editLink);
                 grid.appendChild(row);
+            }
+
+            // --- Post-render: wire up URL-driven line jump and search highlighting ---
+            const rows = Array.from(grid.querySelectorAll('.tmx-row'));
+
+            // Helper to clear previous highlights
+            function clearHighlights() {
+                rows.forEach(r => { r.classList.remove('highlight'); r.classList.remove('search-hit'); });
+                const resultsBox = document.querySelector('.search-results-box');
+                if (resultsBox) resultsBox.remove();
+            }
+
+            const lineParam = urlParams.get('line');
+            const qParam = urlParams.get('q');
+            const filterParam = urlParams.get('filter'); // if '1', hide non-matches
+
+            // If a specific line is requested, find the TU index with that line
+            if (lineParam) {
+                const targetLine = parseInt(lineParam, 10);
+                if (!isNaN(targetLine)) {
+                    // find index of first tuPositions entry equal or greater than targetLine
+                    let targetIndex = tuPositions.findIndex(n => n >= targetLine);
+                    if (targetIndex === -1) targetIndex = tuPositions.length - 1;
+                    if (targetIndex >= 0 && rows[targetIndex]) {
+                        clearHighlights();
+                        const el = rows[targetIndex];
+                        el.classList.add('highlight');
+                        // scroll into view nicely
+                        setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+                    }
+                }
+            }
+
+            // If a search query is present, highlight matches and optionally filter
+            if (qParam) {
+                const q = qParam.trim().toLowerCase();
+                clearHighlights();
+                let matchCount = 0;
+                rows.forEach((r, idx) => {
+                    const src = (r.querySelector('.tmx-cell.source') || {}).textContent || '';
+                    const tgt = (r.querySelector('.tmx-cell.target') || {}).textContent || '';
+                    if ((src + ' ' + tgt).toLowerCase().includes(q)) {
+                        r.classList.add('search-hit');
+                        matchCount += 1;
+                    } else if (filterParam === '1') {
+                        r.style.display = 'none';
+                    }
+                });
+
+                // Show small results box with count and a clear-link
+                const resultsBox = document.createElement('div');
+                resultsBox.className = 'search-results-box';
+                resultsBox.innerHTML = `<strong>Search:</strong> "${escapeHtml(qParam)}" — ${matchCount} result${matchCount !== 1 ? 's' : ''} <a class="clear-search" href="${window.location.pathname + '?file=' + encodeURIComponent(fileName)}">Clear</a>`;
+                if (viewerPage) viewerPage.insertBefore(resultsBox, viewerPage.firstChild);
+
+                // Scroll to first match if any
+                if (matchCount > 0) {
+                    const first = rows.find(r => r.classList.contains('search-hit'));
+                    if (first) setTimeout(() => first.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+                }
             }
 
             msgContainer.style.display = "none";
@@ -246,4 +353,9 @@ document.addEventListener("DOMContentLoaded", function() {
     .edit-on-github-link:hover { text-decoration: underline; }
     .edit-link { margin-left: 0.5rem; font-size: 0.9rem; color: #7b1fa2; text-decoration: none; }
     .edit-link:hover { text-decoration: underline; }
+    .highlight { background: #fff7e6; outline: 2px solid #ffd9b3; }
+    .search-hit { background: #fffaf0; }
+    .search-results-box { background: #fff; border: 1px solid #eee; padding: 0.5rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.95rem; }
+    .search-results-box .clear-search { margin-left: 0.75rem; color: var(--accent-color); text-decoration: none; }
+    .search-results-box .clear-search:hover { text-decoration: underline; }
 </style>
