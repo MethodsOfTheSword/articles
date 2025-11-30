@@ -17,7 +17,6 @@ layout: default
 
     {% if page.slug contains "-transcript_" or page.slug contains "-transcription_" %}
         
-        {% comment %} Extract language code {% endcomment %}
         {% if page.slug contains "-transcription_" %}
             {% assign badge_lang = page.slug | split: "-transcription_" | last | upcase %}
         {% else %}
@@ -27,6 +26,17 @@ layout: default
         <div style="margin-bottom: 10px;">
             <span style="background-color: #fff3e0; color: #e65100; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
                 Transcription ({{ badge_lang }})
+            </span>
+        </div>
+    {% endif %}
+
+    {% if page.slug contains "-translation_" %}
+        
+        {% assign badge_lang = page.slug | split: "-translation_" | last | upcase %}
+
+        <div style="margin-bottom: 10px;">
+            <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
+                Translation ({{ badge_lang }})
             </span>
         </div>
     {% endif %}
