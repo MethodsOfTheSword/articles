@@ -36,6 +36,38 @@ layout: default
         <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
             {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
         </div>
+
+        <div style="background: #222; color: #0f0; padding: 20px; margin: 20px 0; border: 4px solid red; font-family: monospace; white-space: pre-wrap;">
+<strong>🚨 DEBUG CONSOLE</strong>
+--------------------------------------------------
+1. <strong>YOUR POST:</strong>
+   - Page Path:        [{{ page.path }}]
+   - Calculated Name:  [{{ current_filename }}]
+   - Base Name:        [{{ base_name }}]
+   - Manual TMX Link:  [{{ page.tmx_link }}]
+
+2. <strong>SEARCHING ASSETS (site.static_files):</strong>
+   Looking for: [{{ base_name }}.tmx] or [{{ current_filename }}.tmx]
+   
+   {% assign found_any = false %}
+   {% for file in site.static_files %}
+     {% if file.extname == ".tmx" or file.extname == ".TMX" %}
+       {% assign found_any = true %}
+       - Found TMX: [{{ file.name }}] 
+         Match? {% if file.name == current_filename | append: ".tmx" %}✅ YES (Exact){% elsif file.name == base_name | append: ".tmx" %}✅ YES (Base){% else %}❌ No{% endif %}
+     {% endif %}
+   {% endfor %}
+   
+   {% if found_any == false %}
+   ⚠️ <strong>CRITICAL:</strong> No TMX files found in site.static_files.
+   Is your 'assets' folder inside an excluded folder?
+   {% endif %}
+
+3. <strong>THE VERDICT:</strong>
+   Final Target Variable: [{{ final_tmx_target }}]
+--------------------------------------------------
+</div>
+
         {% endif %}
 
         {% assign base_asset_path = '/assets/sources/' | relative_url %}
@@ -70,6 +102,8 @@ layout: default
         {% elsif found_tmx_file %}
             {% assign final_tmx_target = found_tmx_file %}
         {% endif %}
+
+        
 
         {% if final_tmx_target or page.source_link or page.transcription_link %}
         <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
