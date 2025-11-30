@@ -1,0 +1,71 @@
+{% comment %} 
+       STEP A: AUTO-DISCOVERY LOGIC
+       1. Get the current filename without folder or extension
+       2. Look for a matching .tmx file in site.static_files
+    {% endcomment %}
+
+    {% assign current_filename = page.path | split: '/' | last | replace: '.md', '' %}
+    {% assign auto_tmx_file = nil %}
+
+    {% for file in site.static_files %}
+        {% if file.name == current_filename | append: ".tmx" or file.name == current_filename | append: ".TMX" %}
+            {% assign auto_tmx_file = file.name %}
+            {% break %}
+        {% endif %}
+    {% endfor %}
+
+
+    {% comment %} 
+       STEP B: DISPLAY THE BAR 
+       Show if we found an Auto-TMX OR if manual links exist
+    {% endcomment %}
+
+    {% if auto_tmx_file or page.source_link or page.transcription_link or page.tmx_link %}
+    <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+        
+        <strong style="color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;">Source Files:</strong>
+        
+        {% assign base_asset_path = '/assets/sources/' | relative_url %}
+
+        {% if auto_tmx_file %}
+            <a href="{{ '/viewer/' | relative_url }}?file={{ auto_tmx_file }}" target="_blank" style="
+                text-decoration: none; 
+                background-color: #f3e5f5; 
+                color: #7b1fa2; 
+                padding: 4px 10px; 
+                border-radius: 4px; 
+                border: 1px solid #e1bee7;
+                font-weight: 700;
+                display: inline-flex;
+                align-items: center;
+                transition: background 0.2s;">
+                👁️ Open Parallel Viewer
+            </a>
+        {% endif %}
+
+        {% if page.source_link %}
+            {% assign src = page.source_link %}
+            {% unless src contains '://' %}{% assign src = base_asset_path | append: src %}{% endunless %}
+            <a href="{{ src }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                🖼️ Original Scan
+            </a>
+        {% endif %}
+
+        {% if page.tmx_link %}
+            {% assign tmx = page.tmx_link %}
+            {% unless tmx contains '://' %}{% assign tmx = base_asset_path | append: tmx %}{% endunless %}
+            <a href="{{ tmx }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                💾 TMX Data
+            </a>
+        {% endif %}
+
+        {% if page.transcription_link %}
+            {% assign txt = page.transcription_link %}
+            {% unless txt contains '://' %}{% assign txt = base_asset_path | append: txt %}{% endunless %}
+            <a href="{{ txt }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                📝 Raw Text
+            </a>
+        {% endif %}
+
+    </div>
+    {% endif %}
