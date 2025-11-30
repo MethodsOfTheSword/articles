@@ -60,26 +60,30 @@ ul {
     margin-bottom: 1.5rem;
 }
 
-/* Tufte-style lists (styled bullet) scoped to article content to avoid mobile Safari issues
-   with flex-based list items applied globally. */
+/* Tufte-style lists (styled bullets) scoped to article content.
+   Use ::marker for the bullet so browsers render native markers consistently and
+   avoid using flex on list items which can cause marker alignment issues across browsers.
+*/
+article ul {
+    list-style-position: outside;
+    padding-left: 1.6rem; /* space for the marker */
+}
+
 article ul li {
-    display: flex;             /* Turn on the alignment engine inside article body */
-    align-items: baseline;     /* Align the "feet" of the text with the bullet */
+    display: block; /* keep the list-item behavior for consistent markers */
     margin-bottom: 0.5rem;
 }
 
-article ul li::before {
+article ul li::marker {
+    /* Use a heavier dot and the accent color; ::marker is supported in modern Chrome and Safari */
     content: "▪";
     color: var(--accent-color);
-    font-size: 1.2rem;
-    margin-right: 1rem;
+    font-size: 1.15rem;
 }
 
-/* Small-screen fallback: stack list items so bullets and wrapped lines don't misalign on phones.
-   This addresses Safari mobile rendering where flex-baseline behavior can look off. */
+/* Small-screen fallback: ensure spacing remains comfortable on phones */
 @media (max-width: 640px) {
-    article ul li { display: block; }
-    article ul li::before { display: inline-block; margin-right: 0.6rem; }
+    article ul { padding-left: 1.25rem; }
 }
 
 /* Ordered Lists (Numbers) */
@@ -286,12 +290,6 @@ blockquote {
     box-sizing: border-box;
     flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
     -webkit-flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
-}
-
-.post-title {
-    /* font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--accent-color); */
 }
 
 .post-description {
