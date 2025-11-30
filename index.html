@@ -11,17 +11,16 @@ title: "Methods of the Sword Archive"
 
   <h2>Articles & Translations</h2>
 
-  <ul>
+  <ul class="post-list">
     {% for post in site.posts %}
-      <li style="margin-bottom: 1.5rem;">
-        <span style="font-family: 'Consolas', monospace; font-size: 0.9rem; color: #666; display:inline-block; width: 110px;">
+      <li class="post-item">
+        <span class="post-date">
             {{ post.date | date: "%Y-%m-%d" }}
         </span>
-        <a href="{{ post.url | relative_url }}" style="font-size: 1.2rem; font-weight: bold;">
+        <a class="post-title" href="{{ post.url | relative_url }}">
             {{ post.title }}
         </a>
-        <br>
-        <span style="font-size: 1rem; color: #444; margin-left: 114px; display: block;">
+        <span class="post-description">
             {{ post.description }}
         </span>
       </li>
