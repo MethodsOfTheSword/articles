@@ -18,6 +18,7 @@
     {% assign base_slug = parts[0] %}
   {% endif %}
 
+
   {% if is_variant == true %}
     {% assign original = site.posts | where: "slug", base_slug | first %}
     {% if original %}
@@ -26,6 +27,7 @@
       </p>
     {% endif %}
   
+
   {% else %}
 
     {% capture internal_transcripts %}
@@ -48,7 +50,12 @@
     {% capture ext_transcripts %}
       {% if page.external_transcripts %}
         {% for item in page.external_transcripts %}
-          <li><a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a></li>
+          <li>
+            <a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a>
+            {% if item.note %}
+              <span style="color: #666; font-style: italic; font-size: 0.9em;"> — {{ item.note }}</span>
+            {% endif %}
+          </li>
         {% endfor %}
       {% endif %}
     {% endcapture %}
@@ -65,7 +72,12 @@
     {% capture ext_translations %}
       {% if page.external_translations %}
         {% for item in page.external_translations %}
-          <li><a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a></li>
+          <li>
+            <a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a>
+            {% if item.note %}
+              <span style="color: #666; font-style: italic; font-size: 0.9em;"> — {{ item.note }}</span>
+            {% endif %}
+          </li>
         {% endfor %}
       {% endif %}
     {% endcapture %}
