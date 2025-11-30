@@ -5,7 +5,21 @@ date: 1928-10-01
 is_translation: true
 source_link: "https://www.google.com"
 tmx_link: "https://www.bing.com"
-hidden: false
+external_transcripts:
+  - lang: "it"
+    url: "https://wikisource.org/wiki/Scherma"
+    label: "Wikisource (Text Only)"
+    note: "Good quality"
+
+  - lang: "it"
+    url: "https://google.com/books/scan"
+    label: "Google Books Scan"
+    note: "PDF, heavy file"
+
+  - lang: "en"
+    url: "https://fencing-archive.com/partial"
+    label: "Archive.org Backup"
+    note: "Partial text only"
 ---
 
 **Ecco come Nedo Nadi impugna il fioretto.**
