@@ -196,3 +196,27 @@ blockquote {
     transition: background 0.2s;
 }
 .viewer-btn:hover { background-color: #eddff5; }
+
+/* --- Source bar / viewer helpers --- */
+.source-bar {
+    background: #f9f9f9;
+    padding: 12px 15px;
+    border-left: 4px solid var(--accent-color);
+    margin: 20px 0 30px 0;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+.source-label { color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; }
+.source-link { text-decoration: none; color: var(--accent-color); font-weight: 600; }
+
+.tmx-viewer-page { max-width: 900px; margin: 0 auto; }
+.back-nav { margin-bottom: 20px; }
+.back-nav .back-link { text-decoration: none; color: var(--accent-color); }
+.file-name-link { font-family: monospace; color: var(--accent-color); text-decoration: none; border-bottom: 1px dotted var(--accent-color); transition: color 0.2s; margin-left: 5px; }
+.loading-msg { text-align: center; padding: 40px; color: #666; font-style: italic; }
+
+/* hide tmx container until JS shows it */
+.tmx-container { display: none; }

@@ -23,8 +23,8 @@ layout: default
     {% endif %}
 
     {% if show_transcript %}
-        <div style="margin-bottom: 10px;">
-            <span style="background-color: #fff3e0; color: #e65100; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
+        <div class="badge-wrap">
+            <span class="badge badge-transcription">
                 Transcription{% if badge_lang %} ({{ badge_lang }}){% endif %}
             </span>
         </div>
@@ -112,22 +112,11 @@ layout: default
 
 
         {% if viewer_target or download_target or page.source_link or page.transcription_link %}
-        <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-            
-            <strong style="color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;">Source Files:</strong>
-            
+        <div class="source-bar">
+            <strong class="source-label">Source Files:</strong>
+
             {% if viewer_target %}
-                <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ viewer_target }}" target="_blank" style="
-                    text-decoration: none; 
-                    background-color: #f3e5f5; 
-                    color: #7b1fa2; 
-                    padding: 4px 10px; 
-                    border-radius: 4px; 
-                    border: 1px solid #e1bee7;
-                    font-weight: 700;
-                    display: inline-flex;
-                    align-items: center;
-                    transition: background 0.2s;">
+                <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ viewer_target }}" target="_blank" class="viewer-btn">
                     👁️ Open Parallel Viewer
                 </a>
             {% endif %}
@@ -135,13 +124,13 @@ layout: default
             {% if page.source_link %}
                 {% assign src = page.source_link %}
                 {% unless src contains '://' %}{% assign src = base_asset_path | append: src %}{% endunless %}
-                <a href="{{ src }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                <a href="{{ src }}" target="_blank" class="source-link">
                     🖼️ Original Scan
                 </a>
             {% endif %}
 
             {% if download_target %}
-                <a href="{{ download_target }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                <a href="{{ download_target }}" download class="source-link">
                     💾 TMX Data
                 </a>
             {% endif %}
@@ -149,7 +138,7 @@ layout: default
             {% if page.transcription_link %}
                 {% assign txt = page.transcription_link %}
                 {% unless txt contains '://' %}{% assign txt = base_asset_path | append: txt %}{% endunless %}
-                <a href="{{ txt }}" target="_blank" style="text-decoration: none; color: #8b0000; font-weight: 600;">
+                <a href="{{ txt }}" target="_blank" class="source-link">
                     📝 Raw Text
                 </a>
             {% endif %}

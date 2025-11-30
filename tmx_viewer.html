@@ -4,34 +4,32 @@ title: "Universal TMX Viewer"
 permalink: /tmx_viewer/
 ---
 
-<div class="tmx-viewer-page" style="max-width: 900px; margin: 0 auto;">
+<div class="tmx-viewer-page">
 
-    <div class="back-nav" style="margin-bottom: 20px;">
-        <a id="smart-back-btn" href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">
+    <div class="back-nav">
+        <a id="smart-back-btn" href="{{ '/' | relative_url }}" class="back-link">
             &larr; Back to Archive
         </a>
     </div>
 
-    <div style="margin-bottom: 10px;">
-        <span style="background-color: #f3e5f5; color: #7b1fa2; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
-            Parallel Text Viewer
-        </span>
+    <div class="badge-wrap">
+        <span class="badge badge-parallel">Parallel Text Viewer</span>
     </div>
 
     <h1 id="viewer-title" class="post-title">Initializing...</h1>
     
-    <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem;">
-        <strong style="color: #333;">Source File:</strong> 
-        <a id="file-name-link" href="#" target="_blank" style="font-family: monospace; color: #8b0000; text-decoration: none; border-bottom: 1px dotted #8b0000; transition: color 0.2s; margin-left: 5px;">
+    <div class="source-bar">
+        <strong class="source-label">Source File:</strong>
+        <a id="file-name-link" href="#" target="_blank" class="file-name-link">
             ...
         </a>
     </div>
 
-    <div id="loading-msg" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+    <div id="loading-msg" class="loading-msg">
         Starting engine...
     </div>
 
-    <div id="tmx-grid" class="tmx-container" style="display: none;">
+    <div id="tmx-grid" class="tmx-container">
         <div class="tmx-header">
             <div class="tmx-col-head" id="head-src">Source</div>
             <div class="tmx-col-head" id="head-tgt">Target</div>
