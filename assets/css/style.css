@@ -316,13 +316,15 @@ blockquote {
 .post-container > ul { padding-left: 0; }
 .post-container > ul > li { display: flex; align-items: flex-start; margin-bottom: 1.5rem; }
 .post-container > ul > li > span:first-child {
-    /* Date column */
+    /* Date column: avoid fixed px sizing — use clamp with rem equivalents so it scales
+       with root font size and viewport while still acting as a fixed column on wide screens. */
     font-family: 'Consolas', monospace;
     font-size: 0.9rem;
     color: #666;
     display: inline-block;
-    width: 110px;
-    flex: 0 0 110px;
+    box-sizing: border-box;
+    flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
+    -webkit-flex: 0 0 clamp(4.5rem, 14vw, 6.875rem);
 }
 .post-container > ul > li > a {
     font-size: 1.2rem;
