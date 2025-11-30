@@ -191,14 +191,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 row.appendChild(srcCell);
                 row.appendChild(tgtCell);
-                // Per-row edit links removed. The viewer will keep a single top-level
+                // Per-row edit links removed. The viewer keeps a single top-level
                 // "✎ Edit this TMX on GitHub" link; no per-row anchors are appended.
-                editLink.target = '_blank';
-                editLink.rel = 'noopener';
-                editLink.innerText = '✎';
-                editLink.title = 'Edit this segment on GitHub (may prompt to fork)';
-                // append edit link to the target cell (right side)
-                tgtCell.appendChild(editLink);
                 grid.appendChild(row);
             }
 
