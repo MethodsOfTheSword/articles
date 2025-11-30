@@ -87,15 +87,23 @@
     </span>
     
     {% comment %} 2. SCAN ALL POSTS FOR MATCHING PREFIX {% endcomment %}
-    {% for post in site.posts %}
-        {% assign post_name_base = post.name | remove: '.md' %}
+{% for post in site.posts %}
+    {% assign post_name_base = post.name | remove: '.md' %}
+    
+    {% comment %} Define the minimum length a companion must have to be valid {% endcomment %}
+    {% assign min_length = unique_id_prefix | size | plus: 3 %}
+
+    {% comment %} Check 1: Must be longer than the prefix AND not the current page {% endcomment %}
+    {% if post_name_base | size > min_length and post.url != page.url %}
         
-        {% comment %} Check if the post name contains the unique ID prefix {% endcomment %}
-        {% if post_name_base contains unique_id_prefix and post.url != page.url %}
+        {% comment %} Check 2: Slice the post name to the length of the prefix and compare {% endcomment %}
+        {% assign post_prefix = post_name_base | slice: 0, unique_id_prefix | size %}
+        
+        {% if post_prefix == unique_id_prefix %}
             
             {% assign found_links = true %}
             
-            {% comment %} Extract the suffix (e.g., transcription_it) {% endcomment %}
+            {% comment %} Logic Success: Extract suffix and render button {% endcomment %}
             {% assign suffix = post_name_base | remove: unique_id_prefix %}
             {% assign lang_code = suffix | split: "_" | last %}
             
@@ -110,7 +118,8 @@
 
             </a>
         {% endif %}
-    {% endfor %}
+    {% endif %}
+{% endfor %}
     
     {% comment %} 3. ADD FALLBACK LINK TO ENGLISH DEFAULT (If viewing a secondary page) {% endcomment %}
     {% if page.name contains "-translation_" or page.name contains "-transcription_" %}
