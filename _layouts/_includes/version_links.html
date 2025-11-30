@@ -1,0 +1,112 @@
+<div class="article-versions" style="background-color: #fafafa; padding: 1.5rem; border-radius: 5px; margin-top: 2rem; border: 1px solid #eee;">
+  
+  {% assign current_slug = page.slug %}
+  {% assign base_slug = current_slug %}
+  {% assign is_variant = false %}
+
+  {% if current_slug contains "-transcript_" %}
+    {% assign is_variant = true %}
+    {% assign parts = current_slug | split: "-transcript_" %}
+    {% assign base_slug = parts[0] %}
+  {% elsif current_slug contains "-translation_" %}
+    {% assign is_variant = true %}
+    {% assign parts = current_slug | split: "-translation_" %}
+    {% assign base_slug = parts[0] %}
+  {% endif %}
+
+
+  {% if is_variant == true %}
+    
+    {% assign original = site.posts | where: "slug", base_slug | first %}
+    
+    {% if original %}
+      <p style="margin-bottom: 0;">
+        <strong>&larr; Return to Original:</strong> 
+        <a href="{{ original.url }}">{{ original.title }}</a>
+      </p>
+    {% else %}
+      <p style="margin-bottom: 0;">
+        <strong>&larr; Return to Main Article</strong> (Parent file not found)
+      </p>
+    {% endif %}
+  
+
+  {% else %}
+
+    {% capture internal_transcripts %}
+      {% for post in site.posts %}
+        {% if post.slug contains base_slug and post.slug contains "-transcript_" %}
+           {% assign lang_code = post.slug | split: "-transcript_" | last %}
+           <li>
+             <a href="{{ post.url }}">Transcription ({{ lang_code | upcase }})</a>
+           </li>
+        {% endif %}
+      {% endfor %}
+    {% endcapture %}
+
+    {% capture ext_transcripts %}
+      {% if page.external_transcripts %}
+        {% for item in page.external_transcripts %}
+          <li>
+            <a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a>
+            {% if item.note %}
+              <span style="color:#777; font-style:italic; font-size: 0.9em;"> — {{ item.note }}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      {% endif %}
+    {% endcapture %}
+
+    {% capture internal_translations %}
+      {% for post in site.posts %}
+        {% if post.slug contains base_slug and post.slug contains "-translation_" %}
+           {% assign lang_code = post.slug | split: "-translation_" | last %}
+           <li>
+             <a href="{{ post.url }}">Translation ({{ lang_code | upcase }})</a>
+           </li>
+        {% endif %}
+      {% endfor %}
+    {% endcapture %}
+
+    {% capture ext_translations %}
+      {% if page.external_translations %}
+        {% for item in page.external_translations %}
+          <li>
+            <a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a>
+            {% if item.note %}
+              <span style="color:#777; font-style:italic; font-size: 0.9em;"> — {{ item.note }}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      {% endif %}
+    {% endcapture %}
+
+
+    {% assign int_trans_size = internal_transcripts | strip_newlines | size %}
+    {% assign ext_trans_size = ext_transcripts | strip_newlines | size %}
+    
+    {% if int_trans_size > 0 or ext_trans_size > 0 %}
+      <p style="margin-bottom: 0.5rem;"><strong>Transcriptions available:</strong></p>
+      <ul style="margin-top: 0;">
+        {{ internal_transcripts }}
+        {{ ext_transcripts }}
+      </ul>
+    {% endif %}
+
+    {% assign int_transl_size = internal_translations | strip_newlines | size %}
+    {% assign ext_transl_size = ext_translations | strip_newlines | size %}
+
+    {% if int_transl_size > 0 or ext_transl_size > 0 %}
+      <p style="margin-bottom: 0.5rem;"><strong>Translations available:</strong></p>
+      <ul style="margin-top: 0;">
+        {{ internal_translations }}
+        {{ ext_translations }}
+      </ul>
+    {% endif %}
+
+    {% if int_trans_size == 0 and ext_trans_size == 0 and int_transl_size == 0 and ext_transl_size == 0 %}
+       <p style="color: #999; font-style: italic; font-size: 0.9rem;">No other versions available.</p>
+    {% endif %}
+
+  {% endif %}
+</div>

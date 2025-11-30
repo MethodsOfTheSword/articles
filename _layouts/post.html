@@ -1,0 +1,76 @@
+---
+layout: default
+---
+<article class="post-container">
+
+    <div style="margin-bottom: 40px; font-family: sans-serif; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">
+        <a href="{{ '/' | relative_url }}" style="text-decoration: none; color: #8b0000;">&larr; Back to Archive</a>
+    </div>
+
+    {% if page.is_translation %}
+    <div style="margin-bottom: 10px;">
+        <span style="background-color: #e3f2fd; color: #0d47a1; padding: 4px 8px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;">
+            Translation
+        </span>
+    </div>
+    {% endif %}
+
+    <header>
+        <h1 class="post-title">{{ page.title }}</h1>
+        {% if page.subtitle %}
+        <div style="font-style: italic; color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 40px;">
+            {{ page.date | date: "%B %d, %Y" }} • {{ page.subtitle }}
+        </div>
+        {% endif %}
+    </header>
+
+    {% if page.source_link or page.transcription_link or page.tmx_link %}
+    <div class="download-bar" style="background: #f9f9f9; padding: 15px; border-left: 4px solid #8b0000; margin-bottom: 30px;">
+        <span style="font-weight: bold; margin-right: 10px; color: #333;">Assets:</span>
+        
+        {% assign base_asset_path = '/assets/sources/' | relative_url %}
+
+        {% if page.source_link %}
+            {% assign src = page.source_link %}
+            {% unless src contains '://' %}{% assign src = base_asset_path | append: src %}{% endunless %}
+            
+            <a href="{{ src }}" target="_blank" style="margin-right: 15px; text-decoration: none; color: #8b0000;">
+                🖼️ {{ page.source_label | default: "Original Source" }}
+            </a>
+        {% endif %}
+
+        {% if page.transcription_link %}
+            {% assign txt = page.transcription_link %}
+            {% unless txt contains '://' %}{% assign txt = base_asset_path | append: txt %}{% endunless %}
+            
+            <a href="{{ txt }}" target="_blank" style="margin-right: 15px; text-decoration: none; color: #8b0000;">
+                📝 {{ page.transcription_label | default: "Transcription File" }}
+            </a>
+        {% endif %}
+
+        {% if page.tmx_link %}
+            {% assign tmx = page.tmx_link %}
+            {% unless tmx contains '://' %}{% assign tmx = base_asset_path | append: tmx %}{% endunless %}
+            
+            <a href="{{ tmx }}" download style="text-decoration: none; color: #8b0000;">
+                💾 {{ page.tmx_label | default: "Download TMX" }}
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="post-content">
+        {{ content }}
+    </div>
+
+    <hr class="fencing-divider" style="margin: 3rem 0; border: 0; border-top: 1px solid #eee;">
+
+    {% include version_links.html %}
+
+    {% if page.author %}
+    <div style="text-align: right; margin-top: 60px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+        {{ page.author }}
+    </div>
+    {% endif %}
+
+</article>
