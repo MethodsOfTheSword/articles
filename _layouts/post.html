@@ -49,37 +49,52 @@ layout: default
             {% assign base_name = base_name | split: "-transcript_" | first %}
         {% endif %}
 
-        {% assign target_tmx_1 = current_filename | append: ".tmx" %}
-        {% assign target_tmx_2 = base_name | append: ".tmx" %}
-        
-        {% assign found_tmx_file = nil %}
+        {% assign target_1 = current_filename | append: ".tmx" %}
+        {% assign target_2 = base_name | append: ".tmx" %}
+        {% assign auto_file = nil %}
 
         {% for file in site.static_files %}
-            {% assign static_name = file.name | downcase | strip %}
-            
-            {% if static_name == target_tmx_1 %}
-                {% assign found_tmx_file = file.name %}
-                {% break %}
-            {% elsif static_name == target_tmx_2 %}
-                {% assign found_tmx_file = file.name %}
+            {% assign fname = file.name | downcase | strip %}
+            {% if fname == target_1 or fname == target_2 %}
+                {% assign auto_file = file.name %}
                 {% break %}
             {% endif %}
         {% endfor %}
 
-        {% assign final_tmx_target = nil %}
+        {% assign viewer_target = nil %}
+
         {% if page.tmx_link %}
-            {% assign final_tmx_target = page.tmx_link %}
-        {% elsif found_tmx_file %}
-            {% assign final_tmx_target = found_tmx_file %}
+            {% unless page.tmx_link contains '://' %}
+                {% assign viewer_target = page.tmx_link %}
+            {% endunless %}
         {% endif %}
 
-        {% if final_tmx_target or page.source_link or page.transcription_link %}
+        {% unless viewer_target %}
+            {% if auto_file %}
+                {% assign viewer_target = auto_file %}
+            {% endif %}
+        {% endunless %}
+
+
+        {% assign download_target = nil %}
+
+        {% if page.tmx_link %}
+            {% assign download_target = page.tmx_link %}
+            {% unless download_target contains '://' %}
+                {% assign download_target = base_asset_path | append: download_target %}
+            {% endunless %}
+        {% elsif auto_file %}
+            {% assign download_target = base_asset_path | append: auto_file %}
+        {% endif %}
+
+
+        {% if viewer_target or download_target or page.source_link or page.transcription_link %}
         <div class="source-bar" style="background: #f9f9f9; padding: 12px 15px; border-left: 4px solid #8b0000; margin: 20px 0 30px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             
             <strong style="color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;">Source Files:</strong>
             
-            {% if final_tmx_target %}
-                <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ final_tmx_target }}" target="_blank" style="
+            {% if viewer_target %}
+                <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ viewer_target }}" target="_blank" style="
                     text-decoration: none; 
                     background-color: #f3e5f5; 
                     color: #7b1fa2; 
@@ -102,10 +117,8 @@ layout: default
                 </a>
             {% endif %}
 
-            {% if final_tmx_target %}
-                {% assign dl_link = final_tmx_target %}
-                {% unless dl_link contains '://' %}{% assign dl_link = base_asset_path | append: dl_link %}{% endunless %}
-                <a href="{{ dl_link }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
+            {% if download_target %}
+                <a href="{{ download_target }}" download style="text-decoration: none; color: #8b0000; font-weight: 600;">
                     💾 TMX Data
                 </a>
             {% endif %}
