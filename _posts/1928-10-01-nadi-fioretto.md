@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "The Correct Grip of the Foil"
+title: "COME SI IMPUGNA IL FIORETTO"
 date: 1928-10-01
 is_translation: true
 source_link: "https://www.google.com"
@@ -23,8 +23,6 @@ external_transcripts:
 ---
 
 **Ecco come Nedo Nadi impugna il fioretto.**
-
-# COME SI IMPUGNA IL FIORETTO
 
 > *Il modo d'impugnare l'arma costituisce l'abbicì della scherma, e se qualcuno, fosse pure un campione, non vi ha mai badato, farà bene a ricredersi, e ad ascoltare i consigli che impartisce un maestro insuperabile, Nedo Nadi, a proposito del fioretto.*
 
