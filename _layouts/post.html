@@ -113,11 +113,11 @@ layout: default
 
         {% if viewer_target or download_target or page.source_link or page.transcription_link %}
         <div class="source-bar">
-            <strong class="source-label">Source Files:</strong>
+            <strong class="source-label">Related Files:</strong>
 
             {% if viewer_target %}
                 <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ viewer_target }}" target="_blank" class="viewer-btn">
-                    ↔️	Side-by-side
+                    ↔️	Side-by-Side
                 </a>
             {% endif %}
 
@@ -125,13 +125,13 @@ layout: default
                 {% assign src = page.source_link %}
                 {% unless src contains '://' %}{% assign src = base_asset_path | append: src %}{% endunless %}
                 <a href="{{ src }}" target="_blank" class="source-link">
-                    🖼️ Original Scan
+                    🖼️ Original Content
                 </a>
             {% endif %}
 
             {% if download_target %}
                 <a href="{{ download_target }}" download class="source-link">
-                    💾 TMX Data
+                    💾 TMX File
                 </a>
             {% endif %}
 
@@ -139,7 +139,7 @@ layout: default
                 {% assign txt = page.transcription_link %}
                 {% unless txt contains '://' %}{% assign txt = base_asset_path | append: txt %}{% endunless %}
                 <a href="{{ txt }}" target="_blank" class="source-link">
-                    📝 Raw Text
+                    📝 Transcription
                 </a>
             {% endif %}
 
