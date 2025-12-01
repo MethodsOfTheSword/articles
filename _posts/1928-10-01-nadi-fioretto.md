@@ -1,5 +1,6 @@
 ---
 layout: post
+author: "Methods of the Sword"
 date: 1928-10-01
 is_translation: true
 source_link: "https://www.google.com"
