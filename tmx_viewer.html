@@ -157,7 +157,6 @@ document.addEventListener("DOMContentLoaded", function() {
             let raw = str; // original fetched text
             // Per-row TU→line mapping removed: we no longer compute positions for each <tu>.
             // Keep a placeholder in case other code expects this variable.
-            const tuPositions = [];
 
             for (let i = 0; i < tus.length; i++) {
                 let tu = tus[i];
@@ -191,40 +190,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 row.appendChild(srcCell);
                 row.appendChild(tgtCell);
-                // Per-row edit links removed. The viewer keeps a single top-level
-                // "✎ Edit this TMX on GitHub" link; no per-row anchors are appended.
                 grid.appendChild(row);
             }
-
-            // --- Post-render: wire up URL-driven line jump and search highlighting ---
-            const rows = Array.from(grid.querySelectorAll('.tmx-row'));
-
-            // Helper to clear previous highlights
-            function clearHighlights() {
-                rows.forEach(r => { r.classList.remove('highlight'); });
-            }
-
-            const lineParam = urlParams.get('line');
-
-            // If a specific line is requested, find the TU index with that line
-            if (lineParam) {
-                const targetLine = parseInt(lineParam, 10);
-                if (!isNaN(targetLine)) {
-                    // find index of first tuPositions entry equal or greater than targetLine
-                    let targetIndex = tuPositions.findIndex(n => n >= targetLine);
-                    if (targetIndex === -1) targetIndex = tuPositions.length - 1;
-                    if (targetIndex >= 0 && rows[targetIndex]) {
-                        clearHighlights();
-                        const el = rows[targetIndex];
-                        el.classList.add('highlight');
-                        // scroll into view nicely
-                        setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
-                    }
-                }
-            }
-
-            // Note: search (`q` / `filter`) functionality removed.
-
             msgContainer.style.display = "none";
             grid.style.display = "block";
         })
@@ -253,8 +220,6 @@ document.addEventListener("DOMContentLoaded", function() {
     .edit-on-github-root { margin: 0.5rem 0 1rem 0; }
     .edit-on-github-link { font-size: 0.95rem; color: var(--accent-color); text-decoration: none; }
     .edit-on-github-link:hover { text-decoration: underline; }
-    .edit-link { margin-left: 0.5rem; font-size: 0.9rem; color: #7b1fa2; text-decoration: none; }
-    .edit-link:hover { text-decoration: underline; }
     .highlight { background: #fff7e6; outline: 2px solid #ffd9b3; }
     /* Search UI removed — related styles cleaned up. */
 </style>
