@@ -2,6 +2,7 @@
 layout: post
 author: "Methods of the Sword"
 date: 1928-10-01
+subtitle: "Nado Nedi explains the nuances of holding the foil correctly."
 is_translation: true
 source_link: "https://www.google.com"
 tmx_link: "https://www.bing.com"
