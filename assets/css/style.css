@@ -219,8 +219,6 @@ figcaption {
     margin-bottom: 2rem;
 }
 em {
-    font-size: 0.95rem;
-    color: #666;
     font-style: italic;
 }
 blockquote {
@@ -230,6 +228,7 @@ blockquote {
     padding: 1rem 0 1rem 1.25rem;
     border-left: 0.1875rem solid var(--accent-color);
     background: rgba(139, 0, 0, 0.03);
+    color: #666;
 }
 blockquote p {
     margin-top: 0.5rem;
