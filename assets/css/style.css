@@ -55,12 +55,12 @@ h1 { font-weight: 400; font-size: 3rem; margin-top: 0; line-height: 1.1; margin-
 
 .site-title-footer {
     text-align: right;
-    /* Converted 60px to 3.75rem for proportional vertical spacing */
     margin-top: 3.75rem; 
     font-weight: bold;
-    font-size: 2rem;
+    font-size: 1.3rem;
     text-transform: uppercase;
     letter-spacing: 1px;
+    color: #999;
 }
 
 h2 { font-style: italic; font-size: 2rem; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); display: inline-block; padding-bottom: 5px; }
