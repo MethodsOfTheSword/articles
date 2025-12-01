@@ -53,11 +53,12 @@ h1 { font-weight: 400; font-size: 3rem; margin-top: 0; line-height: 1.1; margin-
     margin-bottom: 2.5rem;
 }
 
-.post-author {
+.site-title-footer {
     text-align: right;
     /* Converted 60px to 3.75rem for proportional vertical spacing */
     margin-top: 3.75rem; 
     font-weight: bold;
+    font-size: 2rem;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
