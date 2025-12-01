@@ -231,6 +231,18 @@ blockquote {
     border-left: 0.1875rem solid var(--accent-color);
     background: rgba(139, 0, 0, 0.03);
 }
+blockquote p {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+blockquote p:first-child {
+    margin-top: 0;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
 
 /* --- Badges & viewer button (used in post and tmx templates) --- */
 .badge-wrap { margin-bottom: 10px; }
