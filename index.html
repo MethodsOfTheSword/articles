@@ -4,13 +4,7 @@ title: "Archive"
 ---
 <article class="post-container">
   <h1 class="page-heading">{{ page.title }}</h1>
-  <p class="newthought">Welcome.</p>
-  <p>This is an archive of articles about fencing. </p>
-
   <hr>
-
-  <h2>Articles</h2>
-
     <ul class="post-list">
     {% for post in site.posts %}
       {% unless post.hidden == true %}
