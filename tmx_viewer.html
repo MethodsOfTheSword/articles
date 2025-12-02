@@ -8,7 +8,7 @@ permalink: /tmx_viewer/
 
     <div class="back-to-archive">
         <a id="smart-back-btn" href="{{ '/' | relative_url }}" class="back-link">
-            &larr; Back to Article
+            &larr; Back to Archives
         </a>
     </div>
 
@@ -41,25 +41,30 @@ permalink: /tmx_viewer/
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     
-    // 1. CONFIG & PARAMETERS
+    // --- 1. CONFIGURATION & ROBUST CHECKS ---
     const urlParams = new URLSearchParams(window.location.search);
     let fileName = urlParams.get('file');
+    const returnUrl = urlParams.get('return_url');
+    
     const baseUrl = "{{ site.baseurl }}"; 
     const assetsPath = "{{ '/assets/sources/' | relative_url }}";
 
-    // 2. GET DOM ELEMENTS (And check they exist)
+    // Pull GitHub config from _config.yml via Liquid
+    // We use 'strip' to ensure no accidental whitespace breaks the check
+    const GH_OWNER = '{{ site.github.owner | strip }}';
+    const GH_REPO = '{{ site.github.repo | strip }}';
+    const GH_BRANCH = '{{ site.github.branch | strip }}';
+
+    // Strict Check: All 3 must be non-empty strings
+    const hasValidGithubConfig = (GH_OWNER !== '' && GH_REPO !== '' && GH_BRANCH !== '');
+
+    // --- 2. GET DOM ELEMENTS ---
     const msgContainer = document.getElementById("loading-msg");
     const grid = document.getElementById("tmx-grid");
     const backBtn = document.getElementById("smart-back-btn");
     const fileLink = document.getElementById("file-name-link");
     const title = document.getElementById("viewer-title");
-
-    // GitHub edit link configuration (client-side only - no Liquid required)
-    const GH_OWNER = '{{ site.github.owner }}';
-    const GH_REPO = '{{ site.github.repo }}';
-    const GH_BRANCH = '{{ site.github.branch }}';
-
-    const GH_EDIT_BASE = `https://github.com/${GH_OWNER}/${GH_REPO}/edit/${GH_BRANCH}/assets/sources/`;
+    const viewerPage = document.querySelector('.tmx-viewer-page');
 
     if (!fileName) {
         msgContainer.innerHTML = "<strong>Error:</strong> No file specified in URL.";
@@ -67,46 +72,54 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
     }
 
-    // 3. SANITIZE & UPDATE UI
+    // --- 3. SANITIZE & UPDATE UI ---
+    // Remove paths and special chars to prevent traversal
     fileName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, '');
     
     title.innerText = fileName.replace(".tmx", "").replace(/[-_]/g, " ");
     
-    // Update the clickable file link
     if (fileLink) {
         fileLink.innerText = fileName;
         fileLink.href = assetsPath + fileName;
     }
 
-    // Add a top-level "Edit on GitHub" link (opens the file in GitHub editor at line 1)
-    const viewerPage = document.querySelector('.tmx-viewer-page');
-    if (viewerPage) {
+    // --- 4. ROBUST "EDIT ON GITHUB" BUTTON ---
+    if (viewerPage && hasValidGithubConfig) {
+        const GH_EDIT_BASE = `https://github.com/${GH_OWNER}/${GH_REPO}/edit/${GH_BRANCH}/assets/sources/`;
+        
         const editWrapper = document.createElement('div');
         editWrapper.className = 'edit-on-github-root';
         editWrapper.innerHTML = `<a class="edit-on-github-link" href="${GH_EDIT_BASE + encodeURIComponent(fileName)}#L1" target="_blank" rel="noopener">✎ Request edit through GitHub</a>`;
-        // insert after the source-bar for visibility
+        
+        // Insert safely after source-bar
         const sourceBar = document.querySelector('.source-bar');
-        if (sourceBar && sourceBar.parentNode) sourceBar.parentNode.insertBefore(editWrapper, sourceBar.nextSibling);
-        else viewerPage.insertBefore(editWrapper, viewerPage.firstChild);
+        if (sourceBar && sourceBar.parentNode) {
+            sourceBar.parentNode.insertBefore(editWrapper, sourceBar.nextSibling);
+        } else {
+            viewerPage.insertBefore(editWrapper, viewerPage.firstChild);
+        }
+    } else {
+        // Optional: Log why the button is missing for debugging (only visible in console)
+        if (!hasValidGithubConfig) {
+            console.warn("TMX Viewer: 'Edit on GitHub' button skipped. Missing 'github.owner', 'github.repo', or 'github.branch' in _config.yml.");
+        }
     }
 
-    // 4. ROBUST BACK BUTTON LOGIC
-    const returnUrl = urlParams.get('return_url');
-    
+    // --- 5. ROBUST BACK BUTTON LOGIC ---
     if (returnUrl && backBtn) {
-        // Option A: We have a specific return URL passed from the post
+        // If we have a valid return URL passed from the post, use it.
+        // decodeURIComponent ensures we get the clean URL back
         backBtn.href = decodeURIComponent(returnUrl);
         backBtn.innerHTML = "&larr; Back to Article";
     } else {
-        // Option B: No return URL found (direct access?), fall back to Home
-        backBtn.href = baseUrl; 
+        // Fallback: If user arrived directly (no return_url), go to Archives/Home
+        backBtn.href = "{{ '/' | relative_url }}"; 
         backBtn.innerHTML = "&larr; Back to Archives";
     }
 
-    // 5. FETCH & PARSE
+    // --- 6. FETCH & PARSE TMX ---
     const tmxUrl = assetsPath + fileName;
-    console.log("Fetching TMX from:", tmxUrl);
-
+    
     fetch(tmxUrl)
         .then(response => {
             if (!response.ok) throw new Error("File not found (404)");
@@ -120,49 +133,28 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const header = xmlDoc.getElementsByTagName("header")[0];
             const body = xmlDoc.getElementsByTagName("body")[0];
-            const tus = body.getElementsByTagName("tu");
+            const tus = body ? body.getElementsByTagName("tu") : [];
 
-            if (!tus || tus.length === 0) throw new Error("Empty TMX file.");
+            if (!tus || tus.length === 0) throw new Error("Empty or invalid TMX file.");
 
-            // ===============================================
-            // SMART LANGUAGE DETECTION (HEADER AWARE)
-            // ===============================================
-            
-            // A. Check Header for 'srclang' (e.g., "it")
+            // -- Language Detection --
             let definedSource = header ? header.getAttribute("srclang") : null;
-            
-            // B. Check First Unit for available languages
             let firstUnit = tus[0].getElementsByTagName("tuv");
             let langA = (firstUnit.length >= 1) ? firstUnit[0].getAttribute("xml:lang") : "???";
             let langB = (firstUnit.length >= 2) ? firstUnit[1].getAttribute("xml:lang") : "???";
 
-            // C. Assign Source vs Target
             let srcLang = langA;
             let tgtLang = langB;
 
-            // If the header defines a source, ensure that language is on the Left (Src)
-            if (definedSource) {
-                // If the second language matches the defined source, swap them
-                if (langB.toLowerCase().includes(definedSource.toLowerCase())) {
-                    srcLang = langB;
-                    tgtLang = langA;
-                }
+            if (definedSource && langB.toLowerCase().includes(definedSource.toLowerCase())) {
+                srcLang = langB;
+                tgtLang = langA;
             }
 
-            // D. Update UI Headers
             document.getElementById("head-src").innerText = srcLang.toUpperCase() + " ORIGINAL";
             document.getElementById("head-tgt").innerText = tgtLang.toUpperCase() + " TRANSLATION";
 
-            // ===============================================
-            // RENDER LOOP
-            // ===============================================
-            // We'll precompute the line number for each <tu> occurrence in the raw TMX.
-            // This uses a simple counter: find each '<tu' in the raw text in order
-            // and record the 1-based line number. This is deterministic and fast.
-            let raw = str; // original fetched text
-            // Per-row TU→line mapping removed: we no longer compute positions for each <tu>.
-            // Keep a placeholder in case other code expects this variable.
-
+            // -- Render Loop --
             for (let i = 0; i < tus.length; i++) {
                 let tu = tus[i];
                 let tuvs = tu.getElementsByTagName("tuv");
@@ -174,10 +166,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     let seg = tuvs[j].getElementsByTagName("seg")[0];
                     let text = seg ? seg.textContent : "";
 
-                    // Fuzzy Match (Case insensitive + Partial)
                     if (lang.toLowerCase().includes(srcLang.toLowerCase())) srcText = text;
                     else if (lang.toLowerCase().includes(tgtLang.toLowerCase())) tgtText = text;
-                    // Fallbacks
                     else if (!srcText) srcText = text;
                     else if (!tgtText) tgtText = text;
                 }
@@ -201,30 +191,8 @@ document.addEventListener("DOMContentLoaded", function() {
             grid.style.display = "block";
         })
         .catch(err => {
-            msgContainer.style.color = "red";
-            msgContainer.innerText = "Error: " + err.message;
+            msgContainer.style.color = "#8b0000";
+            msgContainer.innerHTML = "<strong>Error loading TMX:</strong><br>" + err.message;
         });
 });
 </script>
-
-<style>
-    /* Minimal Styles for the grid */
-    .tmx-container { border-top: 2px solid #8b0000; font-family: "Georgia", serif; }
-    .tmx-header { display: grid; grid-template-columns: 1fr 1fr; position: sticky; top: 0; background: white; border-bottom: 1px solid #ccc; z-index: 100; }
-    .tmx-col-head { padding: 10px; font-weight: bold; color: #8b0000; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; font-family: sans-serif; }
-    .tmx-row { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #eee; }
-    .tmx-row:hover { background-color: #fffaf0; }
-    .tmx-cell { padding: 10px; line-height: 1.5; white-space: pre-wrap; }
-    .tmx-cell.source { border-right: 1px solid #eee; color: #6e6e6e; }
-    @media (max-width: 768px) {
-        .tmx-header { display: none; }
-        .tmx-row { display: flex; flex-direction: column; }
-        .tmx-cell.source { border-right: none; border-bottom: 1px dashed #eee; }
-    }
-    /* Edit on GitHub link styles */
-    .edit-on-github-root { margin: 0.5rem 0 1rem 0; }
-    .edit-on-github-link { font-size: 0.95rem; color: var(--accent-color); text-decoration: none; }
-    .edit-on-github-link:hover { text-decoration: underline; }
-    .highlight { background: #fff7e6; outline: 2px solid #ffd9b3; }
-    /* Search UI removed — related styles cleaned up. */
-</style>

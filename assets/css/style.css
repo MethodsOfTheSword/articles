@@ -344,3 +344,91 @@ blockquote p:last-child {
     .post-title { display: block; margin-bottom: 0.25rem; }
     .post-description { margin-top: 0.25rem; }
 }
+
+/* --- TMX Viewer Styles  --- */
+
+/* The main container */
+.tmx-viewer-page {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* The loading message */
+.loading-msg {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+
+/* The Grid Container */
+.tmx-container {
+    display: none; /* Hidden until JS loads it */
+    border-top: 2px solid var(--accent-color);
+    font-family: "Georgia", serif;
+}
+
+/* Header Row (Sticky) */
+.tmx-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: sticky;
+    top: 0;
+    background: var(--bg-color); /* Matches your cream background */
+    border-bottom: 1px solid #ccc;
+    z-index: 100;
+}
+
+.tmx-col-head {
+    padding: 10px;
+    font-weight: bold;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    font-family: sans-serif;
+}
+
+/* Content Rows */
+.tmx-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid #eee;
+}
+
+.tmx-row:hover {
+    background-color: #fffaf0; /* Slight highlight on hover */
+}
+
+.tmx-cell {
+    padding: 10px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.tmx-cell.source {
+    border-right: 1px solid #eee;
+    color: #6e6e6e;
+}
+
+/* File Name Link */
+.file-name-link {
+    font-family: monospace;
+    color: var(--accent-color);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent-color);
+    margin-left: 5px;
+    transition: color 0.2s;
+}
+
+/* Edit Link Styles */
+.edit-on-github-root { margin: 0.5rem 0 1rem 0; }
+.edit-on-github-link { font-size: 0.95rem; color: var(--accent-color); text-decoration: none; }
+.edit-on-github-link:hover { text-decoration: underline; }
+
+/* Responsive: Stack columns on mobile */
+@media (max-width: 768px) {
+    .tmx-header { display: none; }
+    .tmx-row { display: flex; flex-direction: column; }
+    .tmx-cell.source { border-right: none; border-bottom: 1px dashed #eee; }
+}
