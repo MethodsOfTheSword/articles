@@ -55,9 +55,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const title = document.getElementById("viewer-title");
 
     // GitHub edit link configuration (client-side only - no Liquid required)
-    const GH_OWNER = 'methodsofthesword';
-    const GH_REPO = 'articles';
-    const GH_BRANCH = 'main';
+    const GH_OWNER = '{{ site.github.owner }}';
+    const GH_REPO = '{{ site.github.repo }}';
+    const GH_BRANCH = '{{ site.github.branch }}';
     const GH_EDIT_BASE = `https://github.com/${GH_OWNER}/${GH_REPO}/edit/${GH_BRANCH}/assets/sources/`;
 
     if (!fileName) {
