@@ -1,13 +1,16 @@
 title: "Methods of the Sword"
 description: "Fencing Articles"
-author: "Your Name"
-theme: jekyll-theme-primer # We override this, but this keeps the build stable
+author: "William M. Matthews"
+# theme: jekyll-theme-primer # We override this, but this keeps the build stable
 url: "https://methodsofthesword.github.io"
 baseurl: "/articles" # MUST match your repository name
 markdown: kramdown
 permalink: /:year/:month/:day/:title/
 baseurl: "/articles"
-url: "https://methodsofthesword.github.io"
 titles_from_headings:
   strip_title: true
   collections: true
+github:
+  owner: methodsofthesword
+  repo: articles
+  branch: main
