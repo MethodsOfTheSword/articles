@@ -116,7 +116,7 @@ layout: default
             <strong class="source-label">Related Files:</strong>
 
             {% if viewer_target %}
-                <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ viewer_target }}&return_url={{ page.url | url_encode }}" target="_blank" class="viewer-btn">
+                <a href="{{ '/tmx_viewer/' | relative_url }}?file={{ viewer_target }}&return_url={{ page.url | relative_url | url_encode }}" target="_blank" class="viewer-btn">
                     ↔️ Side-by-Side
                 </a>
             {% endif %}
