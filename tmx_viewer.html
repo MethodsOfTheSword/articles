@@ -89,13 +89,17 @@ document.addEventListener("DOMContentLoaded", function() {
         else viewerPage.insertBefore(editWrapper, viewerPage.firstChild);
     }
 
-    // 4. SMART BACK BUTTON LOGIC
-    // Regex: YYYY-MM-DD-title.tmx
-    const match = fileName.match(/^(\d{4})-(\d{2})-(\d{2})-(.+)\.tmx$/i);
-    if (match && backBtn) {
-        const postUrl = `${baseUrl}/${match[1]}/${match[2]}/${match[3]}/${match[4]}/`;
-        backBtn.href = postUrl;
+    // 4. ROBUST BACK BUTTON LOGIC
+    const returnUrl = urlParams.get('return_url');
+    
+    if (returnUrl && backBtn) {
+        // Option A: We have a specific return URL passed from the post
+        backBtn.href = decodeURIComponent(returnUrl);
         backBtn.innerHTML = "&larr; Back to Article";
+    } else {
+        // Option B: No return URL found (direct access?), fall back to Home
+        backBtn.href = baseUrl; 
+        backBtn.innerHTML = "&larr; Back to Archives";
     }
 
     // 5. FETCH & PARSE
