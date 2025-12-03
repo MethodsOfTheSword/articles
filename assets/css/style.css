@@ -16,7 +16,7 @@ body {
     color: var(--text-color);
     font-family: 'et-book', Palatino, "Palatino Linotype", Georgia, serif;
     margin: 0;
-    padding: 36px 18px; /* reduced top/bottom padding to make header/banner less prominent */
+    /* padding: 36px 18px; reduced top/bottom padding to make header/banner less prominent */
     line-height: 1.6;
     font-size: 1.15rem; /* slightly smaller base font for better hierarchy */
 }
