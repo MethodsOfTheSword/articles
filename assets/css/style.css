@@ -27,18 +27,16 @@ article {
 }
 
 /* --- 2. TYPOGRAPHY --- */
-h1 { font-weight: 400; font-size: 3rem; line-height: 1.1; margin-top: 0.35em; margin-bottom: 0.35em; letter-spacing: -0.015em;; }
+h1 { font-weight: 400; font-size: 3rem; line-height: 1.1; margin-top: 0.35em; margin-bottom: 0.35em; letter-spacing: -0.015em; }
 
-/* Optional site banner container — target an element wrapping the site title or banner image.
-   Keep this short and unobtrusive; adjust max-height or padding to taste. */
+/* Optional site banner container */
 .site-banner {
-    max-height: 140px; /* limit how tall the banner can grow */
+    max-height: 140px; 
     overflow: hidden;
-    padding: 12px 0; /* compact vertical padding */
+    padding: 12px 0; 
     display: block;
 }
 
-/* If your layout uses a header element with a site title, make the title smaller and tighter. */
 .site-header .site-title {
     font-size: 1.6rem;
     margin: 0;
@@ -69,45 +67,35 @@ h3 { font-size: 1.4rem; font-variant: small-caps; letter-spacing: 1px; margin-to
 a { color: var(--accent-color); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* --- 3. LISTS (Bulleted & Numbered) --- */
-/* Unordered Lists (Bulleted) — use native markers globally for best compatibility.
-   Apply the Tufte-style inline bullet layout only inside article content where needed. */
+/* --- 3. LISTS --- */
 ul {
-    /* Keep default/native list markers (disc/circle) and spacing for broad browser support */
     list-style-position: outside;
     padding-left: 1.5rem;
     margin-bottom: 1.5rem;
 }
 
-/* Tufte-style lists (styled bullets) scoped to article content.
-   Use ::marker for the bullet so browsers render native markers consistently and
-   avoid using flex on list items which can cause marker alignment issues across browsers.
-*/
 article ul {
     list-style-position: outside;
-    padding-left: 1.6rem; /* space for the marker */
+    padding-left: 1.6rem; 
 }
 
 article ul li {
-    display: block; /* keep the list-item behavior for consistent markers */
+    display: block; 
     margin-bottom: 0.5rem;
 }
 
 article ul li::marker {
-    /* Use a heavier dot and the accent color; ::marker is supported in modern Chrome and Safari */
     content: "▪";
     color: var(--accent-color);
     font-size: 1.15rem;
 }
 
-/* Small-screen fallback: ensure spacing remains comfortable on phones */
 @media (max-width: 640px) {
     article ul { padding-left: 1.25rem; }
 }
 
-/* Ordered Lists (Numbers) */
 ol {
-    padding-left: 3rem; /* More space for numbers */
+    padding-left: 3rem;
     margin-bottom: 1.5rem;
 }
 
@@ -116,13 +104,11 @@ ol li {
     padding-left: 0.5rem;
 }
 
-/* Definition Lists (Glossary) */
 dl { margin-top: 1.5rem; }
 dt { font-weight: bold; margin-top: 1rem; color: var(--accent-color); }
 dd { margin-left: 1.5rem; margin-bottom: 1rem; }
 
 /* --- 4. DIVIDERS & HIGHLIGHTS --- */
-/* Horizontal Rule (The Divider) */
 hr {
     border: 0;
     height: 1px;
@@ -130,14 +116,12 @@ hr {
     margin: 1rem 0;
 }
 
-/* Highlight (for important variables/terms) */
 mark {
-    background-color: #fffdc9; /* Subtle yellow */
+    background-color: #fffdc9; 
     color: #111;
     padding: 0 2px;
 }
 
-/* Keyboard Input (For tech tutorials) */
 kbd {
     font-family: "Consolas", monospace;
     font-size: 0.85rem;
@@ -149,15 +133,12 @@ kbd {
 }
 
 .fencing-divider {
-    /* Taken from original inline style: margin: 3rem 0; */
     margin: 3rem 0; 
-    /* Taken from original inline style: border: 0; */
     border: 0; 
-    /* Taken from original inline style: border-top: 1px solid #eee; */
-    border-top: 1px solid var(--border-color); /* Used variable instead of #eee */
+    border-top: 1px solid var(--border-color);
 }
 
-/* --- 5. TABLES (Scientific Style) --- */
+/* --- 5. TABLES --- */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -218,9 +199,7 @@ figcaption {
     font-style: italic;
     margin-bottom: 2rem;
 }
-em {
-    font-style: italic;
-}
+em { font-style: italic; }
 blockquote {
     font-size: 1.2rem;
     font-style: italic;
@@ -230,20 +209,11 @@ blockquote {
     background: rgba(139, 0, 0, 0.03);
     color: #666;
 }
-blockquote p {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-}
+blockquote p { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+blockquote p:first-child { margin-top: 0; }
+blockquote p:last-child { margin-bottom: 0; }
 
-blockquote p:first-child {
-    margin-top: 0;
-}
-
-blockquote p:last-child {
-    margin-bottom: 0;
-}
-
-/* --- Badges & viewer button (used in post and tmx templates) --- */
+/* --- Badges & viewer button --- */
 .badge-wrap { margin-bottom: 10px; }
 .badge {
     display: inline-block;
@@ -272,13 +242,13 @@ blockquote p:last-child {
 }
 .viewer-btn:hover { background-color: #eddff5; }
 
-/* Back to archive link (used in post layout) */
+/* Back to archive link */
 .back-to-archive {
-    margin-bottom: 2.5rem; /* ~40px */
+    margin-bottom: 2.5rem;
     font-family: sans-serif;
     text-transform: uppercase;
     font-size: 0.8rem;
-    letter-spacing: 0.0625rem; /* 1px -> rem */
+    letter-spacing: 0.0625rem; 
 }
 .back-to-archive .back-link {
     text-decoration: none;
@@ -288,18 +258,13 @@ blockquote p:last-child {
 /* --- Source bar / viewer helpers --- */
 .source-bar {
     background: #f9f9f9;
-    /* Use em units so spacing scales with the source-bar's font-size (chosen to be 0.9rem below).
-       This makes the component self-scaling if its font-size changes (emphasis, accessibility tweaks).
-       Approx conversions (based on 0.9rem ~ 14.4px):
-         12px -> ~0.85em, 15px -> ~1.05em, 4px -> ~0.28em, 20px -> ~1.4em, 30px -> ~2.1em
-    */
-    padding: 0.9em 1.0em;         /* ~12px 15px */
-    border-left: 0.3em solid var(--accent-color); /* ~4px */
-    margin: 1.4em 0 2.1em 0;     /* ~20px top, ~30px bottom */
-    font-size: 0.9rem;           /* keep the slightly reduced text size */
+    padding: 0.9em 1.0em;
+    border-left: 0.3em solid var(--accent-color);
+    margin: 1.4em 0 2.1em 0; 
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
-    gap: 1.0em;                  /* ~15px */
+    gap: 1.0em;
     flex-wrap: wrap;
 }
 .source-label { color: #333; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; }
@@ -311,39 +276,74 @@ blockquote p:last-child {
 .file-name-link { font-family: monospace; color: var(--accent-color); text-decoration: none; border-bottom: 1px dotted var(--accent-color); transition: color 0.2s; margin-left: 5px; }
 .loading-msg { text-align: center; padding: 40px; color: #666; font-style: italic; }
 
-/* hide tmx container until JS shows it */
 .tmx-container { display: none; }
 
-/* --- Post list (index) — simplified and robust layout --- */
+
+/* ========================================================
+   UPDATED: Post list (index) — Visual Hierarchy Layout
+   ======================================================== */
 .post-list {
-    list-style: none; /* we'll use the date column rather than list markers on the index */
+    list-style: none; 
     margin: 0;
     padding: 0;
 }
 
 .post-item { margin-bottom: 1.25rem; }
 
-/* Desktop / wide screens: two-column layout (date + content) */
+/* Desktop / wide screens: two-column layout */
 @media (min-width: 641px) {
-    .post-item { display: flex; align-items: flex-start; }
+    .post-item { 
+        display: flex; 
+        align-items: flex-start; /* Aligns top of date with top of title */
+    }
+    
     .post-date {
-        flex: 0 0 clamp(4.5rem, 14vw, 6.875rem); /* scalable, no px */
+        flex: 0 0 clamp(4.5rem, 14vw, 6.875rem); /* Responsive fixed width */
         margin-right: 1rem;
         font-family: 'Consolas', monospace;
         font-size: 0.9rem;
         color: #666;
     }
-    .post-title { font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--accent-color); line-height: 1.15; }
-    .post-description { color: #444; flex: 1; margin-left: 0; }
+
+    /* New Wrapper for Title + Description */
+    .post-entry-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column; /* Stack Title on top of Description */
+    }
+
+    .post-title { 
+        font-size: 1.15rem; 
+        font-weight: 700; 
+        margin: 0; 
+        color: var(--accent-color); 
+        line-height: 1.15; 
+    }
+
+    .post-description { 
+        font-family: "Georgia", serif; 
+        font-size: 0.95rem;            
+        color: #555;                   
+        margin-top: 0.25rem;           
+        line-height: 1.4;
+        font-style: italic;            
+    }
 }
 
-/* Mobile / small screens: stack vertically, date above title */
+/* Mobile / small screens: stack vertically */
 @media (max-width: 640px) {
     .post-item { display: block; }
     .post-date { display: block; margin-bottom: 0.35rem; }
+    
+    .post-entry-body {
+        display: block;
+        margin-top: 0.25rem;
+    }
+    
     .post-title { display: block; margin-bottom: 0.25rem; }
     .post-description { margin-top: 0.25rem; }
 }
+
 
 /* --- TMX Viewer Styles  --- */
 

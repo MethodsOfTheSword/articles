@@ -6,23 +6,28 @@ title: "Archives"
   <h1 class="page-heading">{{ site.title }}</h1>
   <hr>
   <h2>{{ page.title }}</h2>
-    <ul class="post-list">
+  
+  <ul class="post-list">
     {% for post in site.posts %}
       {% unless post.hidden == true %}
       <li class="post-item">
         <span class="post-date">
             {{ post.date | date: "%Y-%m-%d" }}
         </span>
-        <a class="post-title" href="{{ post.url | relative_url }}">
-            {{ post.title }}
-        </a>
-        <span class="post-description">
-            {{ post.description }}
-        </span>
+
+        <div class="post-entry-body">
+            <a class="post-title" href="{{ post.url | relative_url }}">
+                {{ post.title }}
+            </a>
+            {% if post.description %}
+            <div class="post-description">
+                {{ post.description }}
+            </div>
+            {% endif %}
+        </div>
       </li>
       {% endunless %}
     {% endfor %}
   </ul>
- 
-    </div>
+
 </article>
