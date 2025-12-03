@@ -16,9 +16,9 @@ body {
     color: var(--text-color);
     font-family: 'et-book', Palatino, "Palatino Linotype", Georgia, serif;
     margin: 0;
-    /* padding: 36px 18px; reduced top/bottom padding to make header/banner less prominent */
+    padding: 2.25rem 1.125rem;
     line-height: 1.6;
-    font-size: 1.15rem; /* slightly smaller base font for better hierarchy */
+    font-size: 1.15rem;
 }
 
 article {
@@ -27,7 +27,7 @@ article {
 }
 
 /* --- 2. TYPOGRAPHY --- */
-h1 { font-weight: 400; font-size: 3rem; line-height: 1.1; margin-top: 0.35em; margin-bottom: 0.35em; letter-spacing: -0.6px; }
+h1 { font-weight: 400; font-size: 3rem; line-height: 1.1; margin-top: 0.35em; margin-bottom: 0.35em; letter-spacing: -0.015em;; }
 
 /* Optional site banner container — target an element wrapping the site title or banner image.
    Keep this short and unobtrusive; adjust max-height or padding to taste. */
@@ -59,7 +59,7 @@ h1 { font-weight: 400; font-size: 3rem; line-height: 1.1; margin-top: 0.35em; ma
     font-weight: bold;
     font-size: 1.3rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.05em;
     color: #999;
 }
 
