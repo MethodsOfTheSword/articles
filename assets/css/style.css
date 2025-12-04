@@ -448,3 +448,33 @@ blockquote p:last-child { margin-bottom: 0; }
     .tmx-row { display: flex; flex-direction: column; }
     .tmx-cell.source { border-right: none; border-bottom: 1px dashed var(--subtle-border); }
 }
+
+/* --- Version Links Box (Translations/Transcripts) --- */
+.article-versions {
+    background-color: #fafafa; /* Distinct from code-bg (#f5f5f5) */
+    padding: 1.5rem;
+    border-radius: 5px;
+    margin-top: 2rem;
+    border: 1px solid var(--subtle-border); /* Replaces #eee */
+}
+
+.article-versions p {
+    margin-bottom: 0.5rem;
+}
+
+/* The specific "Return to Original" paragraph needs zero bottom margin */
+.return-link-p {
+    margin-bottom: 0;
+}
+
+/* The lists inside the box */
+.version-list {
+    margin-top: 0;
+}
+
+/* The note text (e.g. "— done by AI") */
+.version-note {
+    color: var(--muted-text); /* Replaces #666 */
+    font-style: italic;
+    font-size: 0.9em;
+}

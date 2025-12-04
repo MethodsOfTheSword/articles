@@ -1,4 +1,4 @@
-<div class="article-versions" style="background-color: #fafafa; padding: 1.5rem; border-radius: 5px; margin-top: 2rem; border: 1px solid #eee;">
+<div class="article-versions">
   
   {% assign current_slug = page.slug %}
   {% assign base_slug = current_slug %}
@@ -22,7 +22,7 @@
   {% if is_variant == true %}
     {% assign original = site.posts | where: "slug", base_slug | first %}
     {% if original %}
-      <p style="margin-bottom: 0;">
+      <p class="return-link-p">
         <strong>&larr; Return to Original:</strong> <a href="{{ original.url | relative_url }}">{{ original.title }}</a>
       </p>
     {% endif %}
@@ -53,7 +53,7 @@
           <li>
             <a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a>
             {% if item.note %}
-              <span style="color: #666; font-style: italic; font-size: 0.9em;"> — {{ item.note }}</span>
+              <span class="version-note"> — {{ item.note }}</span>
             {% endif %}
           </li>
         {% endfor %}
@@ -75,7 +75,7 @@
           <li>
             <a href="{{ item.url }}" target="_blank">{{ item.label }} &#8599;</a>
             {% if item.note %}
-              <span style="color: #666; font-style: italic; font-size: 0.9em;"> — {{ item.note }}</span>
+              <span class="version-note"> — {{ item.note }}</span>
             {% endif %}
           </li>
         {% endfor %}
@@ -83,16 +83,16 @@
     {% endcapture %}
 
     {% if internal_transcripts contains "<li>" or ext_transcripts contains "<li>" %}
-      <p style="margin-bottom: 0.5rem;"><strong>Transcripts available:</strong></p>
-      <ul style="margin-top: 0;">
+      <p><strong>Transcripts available:</strong></p>
+      <ul class="version-list">
         {{ internal_transcripts }}
         {{ ext_transcripts }}
       </ul>
     {% endif %}
 
     {% if internal_translations contains "<li>" or ext_translations contains "<li>" %}
-      <p style="margin-bottom: 0.5rem;"><strong>Translations available:</strong></p>
-      <ul style="margin-top: 0;">
+      <p><strong>Translations available:</strong></p>
+      <ul class="version-list">
         {{ internal_translations }}
         {{ ext_translations }}
       </ul>
