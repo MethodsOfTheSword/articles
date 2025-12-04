@@ -4,11 +4,16 @@
 @import url('et-book.css');
 
 :root {
+    /* -- PALETTE -- */
     --bg-color: #fffff8;       /* Cream Vellum */
     --text-color: #111;        /* Near Black */
+    --muted-text: #666;        /* Standard Gray for meta/descriptions */
     --accent-color: #8b0000;   /* Oxblood Red */
-    --code-bg: #f5f5f5;        /* Light Grey for code */
-    --border-color: #e0e0e0;
+    
+    /* -- STRUCTURAL -- */
+    --code-bg: #f5f5f5;        
+    --border-color: #e0e0e0;   /* Standard border */
+    --subtle-border: #eee;     /* Lighter border for rows/grid */
 }
 
 body {
@@ -27,9 +32,15 @@ article {
 }
 
 /* --- 2. TYPOGRAPHY --- */
-h1 { font-weight: 400; font-size: 3rem; line-height: 1.1; margin-top: 0.35em; margin-bottom: 0.35em; letter-spacing: -0.015em; }
+h1 { 
+    font-weight: 400; 
+    font-size: 3rem; 
+    line-height: 1.1; 
+    margin-top: 0.35em; 
+    margin-bottom: 0.35em; 
+    letter-spacing: -0.015em; 
+}
 
-/* Optional site banner container */
 .site-banner {
     max-height: 140px; 
     overflow: hidden;
@@ -45,7 +56,7 @@ h1 { font-weight: 400; font-size: 3rem; line-height: 1.1; margin-top: 0.35em; ma
 
 .post-meta {
     font-style: italic;
-    color: #555;
+    color: var(--muted-text);
     border-bottom: 1px solid var(--border-color); 
     padding-bottom: 1.25rem;
     margin-bottom: 2.5rem;
@@ -58,11 +69,26 @@ h1 { font-weight: 400; font-size: 3rem; line-height: 1.1; margin-top: 0.35em; ma
     font-size: 1.3rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #999;
+    color: #999; /* Kept unique as it is much lighter than standard muted */
 }
 
-h2 { font-style: italic; font-size: 2rem; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); display: inline-block; padding-bottom: 5px; }
-h3 { font-size: 1.4rem; font-variant: small-caps; letter-spacing: 1px; margin-top: 2rem; color: #444; }
+h2 { 
+    font-style: italic; 
+    font-size: 2rem; 
+    margin-top: 2.5rem; 
+    margin-bottom: 1rem; 
+    border-bottom: 1px solid var(--border-color); 
+    display: inline-block; 
+    padding-bottom: 5px; 
+}
+
+h3 { 
+    font-size: 1.4rem; 
+    font-variant: small-caps; 
+    letter-spacing: 1px; 
+    margin-top: 2rem; 
+    color: #444; /* Slightly darker than muted */
+}
 
 a { color: var(--accent-color); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -75,7 +101,6 @@ ul {
 }
 
 article ul {
-    list-style-position: outside;
     padding-left: 1.6rem; 
 }
 
@@ -88,10 +113,6 @@ article ul li::marker {
     content: "▪";
     color: var(--accent-color);
     font-size: 1.15rem;
-}
-
-@media (max-width: 640px) {
-    article ul { padding-left: 1.25rem; }
 }
 
 ol {
@@ -125,7 +146,7 @@ mark {
 kbd {
     font-family: "Consolas", monospace;
     font-size: 0.85rem;
-    background-color: #eee;
+    background-color: var(--subtle-border);
     border: 1px solid #ccc;
     border-radius: 3px;
     padding: 2px 5px;
@@ -149,7 +170,7 @@ table {
 
 th {
     text-align: left;
-    border-bottom: 2px solid #111;
+    border-bottom: 2px solid var(--text-color);
     padding: 10px 8px;
     font-weight: bold;
     text-transform: uppercase;
@@ -159,16 +180,16 @@ th {
 
 td {
     padding: 10px 8px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border-color);
     vertical-align: top;
 }
-tr:last-child td { border-bottom: 2px solid #111; } 
+tr:last-child td { border-bottom: 2px solid var(--text-color); } 
 
 /* --- 6. CODE BLOCKS --- */
 pre {
     background: var(--code-bg);
     padding: 15px;
-    border: 1px solid #eee;
+    border: 1px solid var(--subtle-border);
     border-radius: 4px;
     overflow-x: auto;
     margin: 2rem 0;
@@ -176,7 +197,7 @@ pre {
 code {
     font-family: "Consolas", monospace;
     font-size: 0.9em;
-    background: rgba(0,0,0,0.05);
+    background: var(--code-bg); /* Unified with pre */
     padding: 2px 4px;
     border-radius: 3px;
 }
@@ -188,18 +209,19 @@ img {
     height: auto;
     display: block;
     margin: 2rem auto 0.5rem auto;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     filter: sepia(0.15) contrast(1.05);
 }
 figcaption {
     display: block;
     text-align: center;
     font-size: 0.95rem;
-    color: #666;
+    color: var(--muted-text);
     font-style: italic;
     margin-bottom: 2rem;
 }
 em { font-style: italic; }
+
 blockquote {
     font-size: 1.2rem;
     font-style: italic;
@@ -207,7 +229,7 @@ blockquote {
     padding: 1rem 0 1rem 1.25rem;
     border-left: 0.1875rem solid var(--accent-color);
     background: rgba(139, 0, 0, 0.03);
-    color: #666;
+    color: var(--muted-text);
 }
 blockquote p { margin-top: 0.5rem; margin-bottom: 0.5rem; }
 blockquote p:first-child { margin-top: 0; }
@@ -224,6 +246,7 @@ blockquote p:last-child { margin-bottom: 0; }
     letter-spacing: 1px;
     text-transform: uppercase;
 }
+/* These retain specific colors as they are semantic */
 .badge-translation { background-color: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; }
 .badge-transcription { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
 .badge-parallel { background-color: #f3e5f5; color: #7b1fa2; border: 1px solid #e1bee7; }
@@ -274,13 +297,12 @@ blockquote p:last-child { margin-bottom: 0; }
 .back-nav { margin-bottom: 20px; }
 .back-nav .back-link { text-decoration: none; color: var(--accent-color); }
 .file-name-link { font-family: monospace; color: var(--accent-color); text-decoration: none; border-bottom: 1px dotted var(--accent-color); transition: color 0.2s; margin-left: 5px; }
-.loading-msg { text-align: center; padding: 40px; color: #666; font-style: italic; }
+.loading-msg { text-align: center; padding: 40px; color: var(--muted-text); font-style: italic; }
 
 .tmx-container { display: none; }
 
-
 /* ========================================================
-   UPDATED: Post list (index) — Visual Hierarchy Layout
+   Post list (index) — Visual Hierarchy Layout
    ======================================================== */
 .post-list {
     list-style: none; 
@@ -290,26 +312,25 @@ blockquote p:last-child { margin-bottom: 0; }
 
 .post-item { margin-bottom: 1.25rem; }
 
-/* Desktop / wide screens: two-column layout */
+/* Desktop */
 @media (min-width: 641px) {
     .post-item { 
         display: flex; 
-        align-items: flex-start; /* Aligns top of date with top of title */
+        align-items: flex-start; 
     }
     
     .post-date {
-        flex: 0 0 clamp(4.5rem, 14vw, 6.875rem); /* Responsive fixed width */
+        flex: 0 0 clamp(4.5rem, 14vw, 6.875rem); 
         margin-right: 1rem;
         font-family: 'Consolas', monospace;
         font-size: 0.9rem;
-        color: #666;
+        color: var(--muted-text);
     }
 
-    /* New Wrapper for Title + Description */
     .post-entry-body {
         flex: 1;
         display: flex;
-        flex-direction: column; /* Stack Title on top of Description */
+        flex-direction: column; 
     }
 
     .post-title { 
@@ -323,17 +344,17 @@ blockquote p:last-child { margin-bottom: 0; }
     .post-description { 
         font-family: "Georgia", serif; 
         font-size: 0.95rem;            
-        color: #555;                   
+        color: #444; /* Slightly darker than muted for readability */
         margin-top: 0.25rem;           
         line-height: 1.4;
         font-style: italic;            
     }
 }
 
-/* Mobile / small screens: stack vertically */
+/* Mobile */
 @media (max-width: 640px) {
     .post-item { display: block; }
-    .post-date { display: block; margin-bottom: 0.35rem; }
+    .post-date { display: block; margin-bottom: 0.35rem; color: var(--muted-text); }
     
     .post-entry-body {
         display: block;
@@ -342,40 +363,39 @@ blockquote p:last-child { margin-bottom: 0; }
     
     .post-title { display: block; margin-bottom: 0.25rem; }
     .post-description { margin-top: 0.25rem; }
+
+    /* Unified Article Padding from previous tweak */
+    article ul { padding-left: 1.25rem; }
 }
 
 
 /* --- TMX Viewer Styles  --- */
 
-/* The main container */
 .tmx-viewer-page {
     max-width: 900px;
     margin: 0 auto;
 }
 
-/* The loading message */
 .loading-msg {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: var(--muted-text);
     font-style: italic;
 }
 
-/* The Grid Container */
 .tmx-container {
-    display: none; /* Hidden until JS loads it */
+    display: none; 
     border-top: 2px solid var(--accent-color);
     font-family: "Georgia", serif;
 }
 
-/* Header Row (Sticky) */
 .tmx-header {
     display: grid;
     grid-template-columns: 1fr 1fr;
     position: sticky;
     top: 0;
-    background: var(--bg-color); /* Matches your cream background */
-    border-bottom: 1px solid #ccc;
+    background: var(--bg-color); 
+    border-bottom: 1px solid var(--border-color); /* standardized */
     z-index: 100;
 }
 
@@ -389,15 +409,14 @@ blockquote p:last-child { margin-bottom: 0; }
     font-family: sans-serif;
 }
 
-/* Content Rows */
 .tmx-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--subtle-border); /* standardized */
 }
 
 .tmx-row:hover {
-    background-color: #fffaf0; /* Slight highlight on hover */
+    background-color: #fffaf0; 
 }
 
 .tmx-cell {
@@ -407,11 +426,10 @@ blockquote p:last-child { margin-bottom: 0; }
 }
 
 .tmx-cell.source {
-    border-right: 1px solid #eee;
-    color: #6e6e6e;
+    border-right: 1px solid var(--subtle-border); /* standardized */
+    color: var(--muted-text); /* standardized */
 }
 
-/* File Name Link */
 .file-name-link {
     font-family: monospace;
     color: var(--accent-color);
@@ -421,14 +439,12 @@ blockquote p:last-child { margin-bottom: 0; }
     transition: color 0.2s;
 }
 
-/* Edit Link Styles */
 .edit-on-github-root { margin: 0.5rem 0 1rem 0; }
 .edit-on-github-link { font-size: 0.95rem; color: var(--accent-color); text-decoration: none; }
 .edit-on-github-link:hover { text-decoration: underline; }
 
-/* Responsive: Stack columns on mobile */
 @media (max-width: 768px) {
     .tmx-header { display: none; }
     .tmx-row { display: flex; flex-direction: column; }
-    .tmx-cell.source { border-right: none; border-bottom: 1px dashed #eee; }
+    .tmx-cell.source { border-right: none; border-bottom: 1px dashed var(--subtle-border); }
 }
